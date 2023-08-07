@@ -13,25 +13,25 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
-const players = {};
+const backEndPlayers = {};
 
 io.on('connection', socket => {
   console.log('a user connected');
-  players[socket.id] = {
+  backEndPlayers[socket.id] = {
     x: 100 + Math.round(Math.random() * 500),
     y: 100 + Math.round(Math.random() * 500),
     radius: 3 + Math.round(Math.random() * 12),
     color: `hsl(${Math.random() * 360}, 100%, 50%)`,
   }
 
-  io.emit('updatePlayers', players);
+  io.emit('updatePlayers', backEndPlayers);
 
   socket.on('disconnect', reason => {
     console.log(reason, socket.id);
-    delete players[socket.id];
-    io.emit('updatePlayers', players);
+    delete backEndPlayers[socket.id];
+    io.emit('updatePlayers', backEndPlayers);
   })
-  console.log(players);
+  console.log(backEndPlayers);
 })
 
 server.listen(port, () => {

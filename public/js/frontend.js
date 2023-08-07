@@ -3,24 +3,26 @@ const c = canvas.getContext('2d')
 
 const scoreEl = document.querySelector('#scoreEl')
 
+const devicePixelRatio = window.devicePixelRatio || 1
+
 const socket = io();
-socket.on('updatePlayers', (backendPlayers) => {
-  for (let id in backendPlayers) {
-    const { x, y, radius, color } = backendPlayers[id];
+socket.on('updatePlayers', (backEndPlayers) => {
+  for (let id in backEndPlayers) {
+    const { x, y, radius, color } = backEndPlayers[id];
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({ x, y, radius, color });
     }
   }
 
   for (let id in frontEndPlayers) {
-    if (!backendPlayers[id]) {
+    if (!backEndPlayers[id]) {
       delete frontEndPlayers[id];
     }
   }
 })
 
-canvas.width = innerWidth
-canvas.height = innerHeight
+canvas.width = innerWidth * devicePixelRatio
+canvas.height = innerHeight * devicePixelRatio
 
 window.addEventListener('resize', () => {
   canvas.width = innerWidth
