@@ -26,6 +26,24 @@ io.on('connection', socket => {
 
   io.emit('updatePlayers', backEndPlayers);
 
+  socket.on('keydown', direction => {
+    console.log(direction, socket.id);
+    switch (direction) {
+      case "left":
+        backEndPlayers[socket.id].x -= 5
+        break
+      case "right":
+        backEndPlayers[socket.id].x += 5
+        break
+      case "up":
+        backEndPlayers[socket.id].y -= 5
+        break
+      case "down":
+        backEndPlayers[socket.id].y += 5
+        break
+    }
+  })
+
   socket.on('disconnect', reason => {
     console.log(reason, socket.id);
     delete backEndPlayers[socket.id];
@@ -33,6 +51,10 @@ io.on('connection', socket => {
   })
   console.log(backEndPlayers);
 })
+
+setInterval(() => {
+  io.emit('updatePlayers', backEndPlayers);
+}, 15);
 
 server.listen(port, () => {
   console.log(`Example app listening on http://localhost:${port}`)

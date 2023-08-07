@@ -7,10 +7,14 @@ const devicePixelRatio = window.devicePixelRatio || 1
 
 const socket = io();
 socket.on('updatePlayers', (backEndPlayers) => {
+  console.log('updating players', backEndPlayers);
   for (let id in backEndPlayers) {
     const { x, y, radius, color } = backEndPlayers[id];
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({ x, y, radius, color });
+    } else {
+      frontEndPlayers[id].x = x;
+      frontEndPlayers[id].y = y;
     }
   }
 
@@ -45,11 +49,24 @@ function animate() {
   }
 }
 
-document.addEventListener('click', ev => {
-  const currentPlayer = frontEndPlayers[socket.id];
-  currentPlayer.x = ev.clientX;
-  currentPlayer.y = ev.clientY;
-})
-
 animate()
-// spawnEnemies()
+
+window.addEventListener('keydown', ev => {
+  if (!frontEndPlayers[socket.id]) return;
+
+  switch (ev.code) {
+    case "KeyD":
+      socket.emit('keydown', 'right');
+      break
+    case "KeyA":
+      socket.emit('keydown', 'left');
+      break
+    case "KeyW":
+      socket.emit('keydown', 'up');
+      break
+
+    case "KeyS":
+      socket.emit('keydown', 'down');
+      break
+  }
+})
