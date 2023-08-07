@@ -21,7 +21,7 @@ io.on('connection', socket => {
     x: 100 + Math.round(Math.random() * 500),
     y: 100 + Math.round(Math.random() * 500),
     radius: 3 + Math.round(Math.random() * 12),
-    color: 'red',
+    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
   }
 
   io.emit('updatePlayers', players);
