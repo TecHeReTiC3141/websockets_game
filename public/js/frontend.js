@@ -7,7 +7,6 @@ const devicePixelRatio = window.devicePixelRatio || 1
 
 const socket = io();
 socket.on('updatePlayers', (backEndPlayers) => {
-  console.log('updating players', backEndPlayers);
   for (let id in backEndPlayers) {
     const { x, y, radius, color } = backEndPlayers[id];
     if (!frontEndPlayers[id]) {
@@ -50,27 +49,46 @@ function animate() {
 }
 
 animate()
+const keys = {
+  w: {
+    pressed: false,
+  },
+  s: {
+    pressed: false,
+  },
+  a: {
+    pressed: false,
+  },
+  d: {
+    pressed: false,
+  },
+}
+
+setInterval(() => {
+  if (keys.d.pressed) {
+    frontEndPlayers[socket.id].x += 5
+    socket.emit('keydown', 'right');
+  }
+  if (keys.a.pressed) {
+    frontEndPlayers[socket.id].x -= 5
+    socket.emit('keydown', 'left');
+  }
+  if (keys.w.pressed) {
+    frontEndPlayers[socket.id].y -= 5
+    socket.emit('keydown', 'up');
+  }
+  if (keys.s.pressed) {
+    frontEndPlayers[socket.id].y += 5
+    socket.emit('keydown', 'down');
+  }
+}, 15);
 
 window.addEventListener('keydown', ev => {
-  if (!frontEndPlayers[socket.id]) return;
+  if (!frontEndPlayers[socket.id] || !(ev.key in keys)) return;
+  keys[ev.key].pressed = true;
+})
 
-  switch (ev.code) {
-    case "KeyD":
-      frontEndPlayers[socket.id].x += 5
-      socket.emit('keydown', 'right');
-      break
-    case "KeyA":
-      frontEndPlayers[socket.id].x -= 5
-      socket.emit('keydown', 'left');
-      break
-    case "KeyW":
-      frontEndPlayers[socket.id].y -= 5
-      socket.emit('keydown', 'up');
-      break
-
-    case "KeyS":
-      frontEndPlayers[socket.id].y += 5
-      socket.emit('keydown', 'down');
-      break
-  }
+window.addEventListener('keyup', ev => {
+  if (!frontEndPlayers[socket.id] || !(ev.key in keys)) return;
+  keys[ev.key].pressed = false;
 })
