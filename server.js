@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 
 const port = 3000
+const PLAYER_SPEED = 5;
 
 app.use(express.static('public'))
 
@@ -30,16 +31,16 @@ io.on('connection', socket => {
     console.log(direction, socket.id);
     switch (direction) {
       case "left":
-        backEndPlayers[socket.id].x -= 5
+        backEndPlayers[socket.id].x -= PLAYER_SPEED
         break
       case "right":
-        backEndPlayers[socket.id].x += 5
+        backEndPlayers[socket.id].x += PLAYER_SPEED
         break
       case "up":
-        backEndPlayers[socket.id].y -= 5
+        backEndPlayers[socket.id].y -= PLAYER_SPEED
         break
       case "down":
-        backEndPlayers[socket.id].y += 5
+        backEndPlayers[socket.id].y += PLAYER_SPEED
         break
     }
   })

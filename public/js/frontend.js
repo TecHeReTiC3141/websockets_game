@@ -56,16 +56,20 @@ window.addEventListener('keydown', ev => {
 
   switch (ev.code) {
     case "KeyD":
+      frontEndPlayers[socket.id].x += 5
       socket.emit('keydown', 'right');
       break
     case "KeyA":
+      frontEndPlayers[socket.id].x -= 5
       socket.emit('keydown', 'left');
       break
     case "KeyW":
+      frontEndPlayers[socket.id].y -= 5
       socket.emit('keydown', 'up');
       break
 
     case "KeyS":
+      frontEndPlayers[socket.id].y += 5
       socket.emit('keydown', 'down');
       break
   }
