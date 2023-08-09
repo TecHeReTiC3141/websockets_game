@@ -1,4 +1,7 @@
 class Player {
+
+  static SPEED = 8;
+
   constructor({ x, y, radius, color }) {
     this.x = x
     this.y = y

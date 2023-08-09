@@ -6,7 +6,7 @@ const { Server } = require('socket.io');
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 
 const port = 3000
-const PLAYER_SPEED = 5;
+const PLAYER_SPEED = 8;
 
 app.use(express.static('public'))
 
@@ -23,12 +23,13 @@ io.on('connection', socket => {
     y: 100 + Math.round(Math.random() * 500),
     radius: 3 + Math.round(Math.random() * 12),
     color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+    sequenceNumber: 0,
   }
 
   io.emit('updatePlayers', backEndPlayers);
 
-  socket.on('keydown', direction => {
-    console.log(direction, socket.id);
+  socket.on('keydown', ({ direction, sequenceNumber }) => {
+    backEndPlayers[socket.id].sequenceNumber = sequenceNumber;
     switch (direction) {
       case "left":
         backEndPlayers[socket.id].x -= PLAYER_SPEED

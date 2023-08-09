@@ -14,6 +14,18 @@ socket.on('updatePlayers', (backEndPlayers) => {
     } else {
       frontEndPlayers[id].x = x;
       frontEndPlayers[id].y = y;
+      if (id === socket.id) {
+        const lastServerInputIndex = playerInputs.findIndex(input => {
+          return backEndPlayers[id].sequenceNumber === input.sequenceNumber;
+        })
+        if (lastServerInputIndex !== -1) {
+          playerInputs.splice(0, lastServerInputIndex + 1);
+        }
+        for (let input of playerInputs) {
+          frontEndPlayers[id].x += input.dx;
+          frontEndPlayers[id].y += input.dy;
+        }
+      }
     }
   }
 
@@ -64,23 +76,31 @@ const keys = {
   },
 }
 
+const playerInputs = [];
+let sequenceNumber = 0;
+
 setInterval(() => {
   if (keys.d.pressed) {
-    frontEndPlayers[socket.id].x += 5
-    socket.emit('keydown', 'right');
+    playerInputs.push({sequenceNumber: ++sequenceNumber, dx: Player.SPEED, dy: 0})
+    frontEndPlayers[socket.id].x += Player.SPEED;
+    socket.emit('keydown', { direction: 'right', sequenceNumber});
   }
   if (keys.a.pressed) {
-    frontEndPlayers[socket.id].x -= 5
-    socket.emit('keydown', 'left');
+    playerInputs.push({sequenceNumber: ++sequenceNumber, dx: -Player.SPEED, dy: 0})
+    frontEndPlayers[socket.id].x -= Player.SPEED
+    socket.emit('keydown', { direction: 'left', sequenceNumber});
   }
   if (keys.w.pressed) {
-    frontEndPlayers[socket.id].y -= 5
-    socket.emit('keydown', 'up');
+    playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: -Player.SPEED})
+    frontEndPlayers[socket.id].y -= Player.SPEED
+    socket.emit('keydown', { direction: 'up', sequenceNumber});
   }
   if (keys.s.pressed) {
-    frontEndPlayers[socket.id].y += 5
-    socket.emit('keydown', 'down');
+    playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: Player.SPEED})
+    frontEndPlayers[socket.id].y += Player.SPEED
+    socket.emit('keydown', { direction: 'down', sequenceNumber});
   }
+  console.log(playerInputs);
 }, 15);
 
 window.addEventListener('keydown', ev => {
