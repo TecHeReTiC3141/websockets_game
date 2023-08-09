@@ -43,6 +43,30 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
 })
 
+socket.on('updateProjectiles', (backEndProjectiles) => {
+    for (let id in backEndProjectiles) {
+        const {x, y, velocity, playerId} = backEndProjectiles[id];
+        if (!frontEndProjectiles[id]) {
+            frontEndProjectiles[id] = new Projectile({
+                x,
+                y,
+                radius: 5,
+                color: frontEndPlayers[playerId]?.color || 'white',
+                velocity
+            })
+        } else {
+            frontEndProjectiles[id].x = x;
+            frontEndProjectiles[id].y = y;
+        }
+    }
+
+    for (let id in frontEndProjectiles) {
+        if (!backEndProjectiles[id]) {
+            delete frontEndProjectiles[id];
+        }
+    }
+})
+
 canvas.width = innerWidth * devicePixelRatio
 canvas.height = innerHeight * devicePixelRatio
 
@@ -55,7 +79,7 @@ const x = canvas.width / 2
 const y = canvas.height / 2
 
 const frontEndPlayers = {}
-let frontEndProjectiles = [];
+let frontEndProjectiles = {};
 
 let animationId
 
@@ -67,14 +91,11 @@ function animate() {
         let player = frontEndPlayers[playerId];
         player.draw()
     }
-    // also could loop projectiles from the back to pop them in the same loop
-    frontEndProjectiles.forEach(proj => {
-        proj.update();
-        proj.draw();
-    })
-    frontEndProjectiles = frontEndProjectiles.filter(proj =>
-        proj.x > 0 && proj.x < window.innerWidth && proj.y > 0 && proj.y < window.innerHeight);
-    console.log(frontEndProjectiles);
+    // // also could loop projectiles from the back to pop them in the same loop
+    for (let projectileId in frontEndProjectiles) {
+        let projectile = frontEndProjectiles[projectileId];
+        projectile.draw()
+    }
 }
 
 animate()

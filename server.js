@@ -28,7 +28,7 @@ io.on('connection', socket => {
     sequenceNumber: 0,
   }
 
-  io.emit('updatePlayers', backEndPlayers);
+  // io.emit('updatePlayers', backEndPlayers);
 
   socket.on('keydown', ({ direction, sequenceNumber }) => {
     backEndPlayers[socket.id].sequenceNumber = sequenceNumber;
@@ -57,6 +57,7 @@ io.on('connection', socket => {
       x, y, velocity,
       playerId: socket.id,
     }
+    console.log(backEndProjectiles);
   })
 
   socket.on('disconnect', reason => {
@@ -68,7 +69,14 @@ io.on('connection', socket => {
 })
 
 setInterval(() => {
+  for (let id in backEndProjectiles) {
+    backEndProjectiles[id].x += backEndProjectiles[id].velocity.x;
+    backEndProjectiles[id].y += backEndProjectiles[id].velocity.y;
+  }
+  console.log(backEndProjectiles);
+
   io.emit('updatePlayers', backEndPlayers);
+  io.emit('updateProjectiles', backEndProjectiles);
 }, 15);
 
 server.listen(port, () => {
