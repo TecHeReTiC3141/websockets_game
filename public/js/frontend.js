@@ -12,19 +12,27 @@ socket.on('updatePlayers', (backEndPlayers) => {
     if (!frontEndPlayers[id]) {
       frontEndPlayers[id] = new Player({ x, y, radius, color });
     } else {
-      frontEndPlayers[id].x = x;
-      frontEndPlayers[id].y = y;
+
       if (id === socket.id) {
+        frontEndPlayers[id].x = x;
+        frontEndPlayers[id].y = y;
         const lastServerInputIndex = playerInputs.findIndex(input => {
           return backEndPlayers[id].sequenceNumber === input.sequenceNumber;
         })
         if (lastServerInputIndex !== -1) {
           playerInputs.splice(0, lastServerInputIndex + 1);
         }
+        console.log(sequenceNumber, backEndPlayers[id].sequenceNumber, playerInputs);
         for (let input of playerInputs) {
           frontEndPlayers[id].x += input.dx;
           frontEndPlayers[id].y += input.dy;
         }
+      } else {
+        gsap.to(frontEndPlayers[id], {
+          x, y,
+          duration: 0.015,
+          ease: 'linear',
+        })
       }
     }
   }
@@ -100,7 +108,6 @@ setInterval(() => {
     frontEndPlayers[socket.id].y += Player.SPEED
     socket.emit('keydown', { direction: 'down', sequenceNumber});
   }
-  console.log(playerInputs);
 }, 15);
 
 window.addEventListener('keydown', ev => {
