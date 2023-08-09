@@ -67,7 +67,7 @@ function animate() {
         let player = frontEndPlayers[playerId];
         player.draw()
     }
-
+    // also could loop projectiles from the back to pop them in the same loop
     frontEndProjectiles.forEach(proj => {
         proj.update();
         proj.draw();

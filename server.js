@@ -6,7 +6,7 @@ const { Server } = require('socket.io');
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 
 const port = 3000
-const PLAYER_SPEED = 10;
+const PLAYER_SPEED = 10, PROJECTILE_SPEED = 5;
 
 app.use(express.static('public'))
 
@@ -15,6 +15,8 @@ app.get('/', (req, res) => {
 })
 
 const backEndPlayers = {};
+const backEndProjectiles = {};
+let projectileId = 0;
 
 io.on('connection', socket => {
   console.log('a user connected');
@@ -43,6 +45,17 @@ io.on('connection', socket => {
       case "down":
         backEndPlayers[socket.id].y += PLAYER_SPEED
         break
+    }
+  })
+
+  socket.on('shoot', ({ x, y, angle }) => {
+    const velocity = {
+      x: Math.cos(angle) * PROJECTILE_SPEED,
+      y: Math.sin(angle) * PROJECTILE_SPEED,
+    }
+    backEndProjectiles[++projectileId] = {
+      x, y, velocity,
+      playerId: socket.id,
     }
   })
 

@@ -8,13 +8,19 @@ window.addEventListener('click', (event) => {
         x: Math.cos(angle),
         y: Math.sin(angle)
     }
-    frontEndProjectiles.push(
-        new Projectile({
-            x: currentPlayer.x,
-            y: currentPlayer.y,
-            radius: 5,
-            color: 'white',
-            velocity
-        })
-    );
+
+    socket.emit('shoot', {
+        x: currentPlayer.x,
+        y: currentPlayer.y,
+        angle
+    })
+    // frontEndProjectiles.push(
+    //     new Projectile({
+    //         x: currentPlayer.x,
+    //         y: currentPlayer.y,
+    //         radius: 5,
+    //         color: 'white',
+    //         velocity
+    //     })
+    // );
 })
