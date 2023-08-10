@@ -1,10 +1,13 @@
 class Projectile {
-  constructor(x, y, radius, color, velocity) {
+
+  speed = 5;
+  constructor({ x, y, radius, color, velocity, playerId }) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
     this.velocity = velocity
+    this.playerId = playerId
   }
 
   draw() {
@@ -16,7 +19,7 @@ class Projectile {
 
   update() {
     this.draw()
-    this.x = this.x + this.velocity.x
-    this.y = this.y + this.velocity.y
+    this.x = this.x + this.velocity.x * this.speed;
+    this.y = this.y + this.velocity.y * this.speed;
   }
 }

@@ -1,0 +1,76 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+}
+
+.leaderboard {
+    position: absolute;
+    top: 0;
+    left: .5rem;
+    color: white;
+    user-select: none;
+
+    background: rgba(0, 0, 0, .7);
+    border-radius: .5rem;
+}
+
+.leaderboard .title {
+    margin-bottom: 1rem;
+    text-decoration: underline;
+    text-align: center;
+}
+
+.username-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.username-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.username-container #name {
+    display: block;
+    border-radius: 1.25rem;
+    padding: .5rem 1rem ;
+    background-color: #475569;
+    color:  rgba(255, 255, 255, .9);
+    outline: none;
+}
+
+.username-container #name::placeholder {
+    color: #94a3b8;
+}
+
+.username-container #name:focus {
+    outline: 2px solid lightgray;
+}
+
+.username-container button {
+    color: white;
+    margin-top: .5rem;
+    border-radius: 1.25rem;
+    padding: .5rem 1rem;
+    background-image: linear-gradient(to right,  rgb(6, 182, 212),
+    rgb(59, 130, 246));
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 4px gray;
+    position: relative;
+}
+
+.username-container button:active {
+    top: 4px;
+    box-shadow: none;
+}
+
