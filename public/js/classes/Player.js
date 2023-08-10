@@ -3,11 +3,12 @@ class Player {
   static SPEED = 10;
   static MAX_RADIUS = 15;
 
-  constructor({ x, y, radius, color }) {
+  constructor({ x, y, radius, color, score = 0 }) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
+    this.score = score
   }
 
   draw() {

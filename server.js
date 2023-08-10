@@ -30,6 +30,7 @@ io.on('connection', socket => {
         health: 100,
         color: `hsl(${Math.random() * 360}, 100%, 50%)`,
         sequenceNumber: 0,
+        score: 0,
     }
 
     io.emit('updatePlayers', backEndPlayers);
@@ -94,7 +95,8 @@ setInterval(() => {
             || curProj.y - PROJECTILE_RADIUS >=
                 backEndPlayers[curProj.playerId]?.canvas?.height
             || curProj.x + PROJECTILE_RADIUS <= 0
-            || curProj.y + PROJECTILE_RADIUS <= 0) {
+            || curProj.y + PROJECTILE_RADIUS <= 0
+        || !(curProj.playerId in backEndPlayers)) {
             delete backEndProjectiles[id];
             continue;
         }
@@ -108,6 +110,7 @@ setInterval(() => {
             if (di <= backEndPlayer.radius + PROJECTILE_RADIUS) {
                 delete backEndProjectiles[id];
                 backEndPlayer.health -= 25;
+                backEndPlayers[curProj.playerId].score += 25;
                 if (backEndPlayer.health === 0) {
                     delete backEndPlayers[playerId];
                 }
