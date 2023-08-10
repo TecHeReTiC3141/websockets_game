@@ -31,6 +31,7 @@ io.on('connection', socket => {
         color: `hsl(${Math.random() * 360}, 100%, 50%)`,
         sequenceNumber: 0,
         score: 0,
+        username: null,
     }
 
     io.emit('updatePlayers', backEndPlayers);
@@ -42,8 +43,12 @@ io.on('connection', socket => {
 
         backEndPlayers[socket.id].radius = PLAYER_RADIUS;
         if (devicePixelRatio > 1) {
-            backEndPlayers[socket.id].radius *= 2;
+            backEndPlayers[socket.id].radius *= 2
         }
+    })
+
+    socket.on('startGame', (name) => {
+        backEndPlayers[socket.id].username = name
     })
 
     socket.on('keydown', ({ direction, sequenceNumber }) => {

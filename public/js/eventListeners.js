@@ -15,3 +15,12 @@ window.addEventListener('click', (event) => {
         angle
     })
 })
+
+const usernameForm = document.querySelector('.username-form');
+usernameForm.addEventListener('submit', ev => {
+    ev.preventDefault();
+    const name = usernameForm.querySelector('#name').value;
+    console.log(name);
+    socket.emit('startGame', name);
+    document.querySelector('.username-container').style.display = 'none';
+})

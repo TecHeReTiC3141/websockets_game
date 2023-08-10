@@ -17,9 +17,10 @@ socket.on('connect', () => {
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in backEndPlayers) {
-        const {x, y, radius, color, health, score } = backEndPlayers[id];
+        const {x, y, radius, color, health, score, username } = backEndPlayers[id];
+        if (!username) continue;
         if (!frontEndPlayers[id]) {
-            frontEndPlayers[id] = new Player({x, y, radius, color});
+            frontEndPlayers[id] = new Player({x, y, radius, color, username});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             frontEndPlayers[id].score = score;
@@ -56,7 +57,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
     const leaderboardData = [];
     for (let id in frontEndPlayers) {
         leaderboardData.push({
-            name: id,
+            name: frontEndPlayers[id].username,
             score: frontEndPlayers[id].score,
         })
 
