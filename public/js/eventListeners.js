@@ -19,8 +19,12 @@ window.addEventListener('click', (event) => {
 const usernameForm = document.querySelector('.username-form');
 usernameForm.addEventListener('submit', ev => {
     ev.preventDefault();
-    const name = usernameForm.querySelector('#name').value;
-    console.log(name);
-    socket.emit('startGame', name);
+    const username = usernameForm.querySelector('#name').value;
+    socket.emit('startGame', {
+        username,
+        width: canvas.width,
+        height: canvas.height,
+        devicePixelRatio
+    });
     document.querySelector('.username-container').style.display = 'none';
 })

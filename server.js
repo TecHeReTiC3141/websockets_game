@@ -23,32 +23,28 @@ let projectileId = 0;
 
 io.on('connection', socket => {
     console.log('a user connected');
-    backEndPlayers[socket.id] = {
-        x: 100 + Math.round(Math.random() * 500),
-        y: 100 + Math.round(Math.random() * 500),
-        radius: 10,
-        health: 100,
-        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-        sequenceNumber: 0,
-        score: 0,
-        username: null,
-    }
+
 
     io.emit('updatePlayers', backEndPlayers);
 
-    socket.on('initCanvas', ({ width, height, devicePixelRatio }) => {
-        backEndPlayers[socket.id].canvas = {
-            width, height,
+    socket.on('startGame', ({ username, width, height, devicePixelRatio }) => {
+        backEndPlayers[socket.id] = {
+            x: 100 + Math.round(Math.random() * 500),
+            y: 100 + Math.round(Math.random() * 500),
+            radius: 10,
+            health: 100,
+            color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+            sequenceNumber: 0,
+            score: 0,
+            username,
+            canvas: {
+                width, height,
+            }
         }
-
         backEndPlayers[socket.id].radius = PLAYER_RADIUS;
         if (devicePixelRatio > 1) {
             backEndPlayers[socket.id].radius *= 2
         }
-    })
-
-    socket.on('startGame', (name) => {
-        backEndPlayers[socket.id].username = name
     })
 
     socket.on('keydown', ({ direction, sequenceNumber }) => {
@@ -111,7 +107,6 @@ setInterval(() => {
             const backEndPlayer = backEndPlayers[playerId];
             const di = Math.hypot(backEndPlayer.x - curProj.x,
                 backEndPlayer.y - curProj.y);
-            console.log(di, backEndPlayer.radius, PROJECTILE_RADIUS);
             if (di <= backEndPlayer.radius + PROJECTILE_RADIUS) {
                 delete backEndProjectiles[id];
                 backEndPlayer.health -= 25;
