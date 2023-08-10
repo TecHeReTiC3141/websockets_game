@@ -7,7 +7,6 @@ const devicePixelRatio = window.devicePixelRatio || 1
 
 const socket = io();
 
-
 socket.on('connect', () => {
     socket.emit('initCanvas', {
         width: canvas.width,
@@ -18,11 +17,11 @@ socket.on('connect', () => {
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in backEndPlayers) {
-        const {x, y, radius, color} = backEndPlayers[id];
+        const {x, y, radius, color, health } = backEndPlayers[id];
         if (!frontEndPlayers[id]) {
             frontEndPlayers[id] = new Player({x, y, radius, color});
         } else {
-
+            frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             if (id === socket.id) {
                 frontEndPlayers[id].x = x;
                 frontEndPlayers[id].y = y;
@@ -50,6 +49,12 @@ socket.on('updatePlayers', (backEndPlayers) => {
         if (!backEndPlayers[id]) {
             delete frontEndPlayers[id];
         }
+    }
+
+    $('.players').empty();
+    for (let id in frontEndPlayers) {
+        const newItem = $(`<li>${id}</li>`);
+        $('.players').append(newItem);
     }
 })
 

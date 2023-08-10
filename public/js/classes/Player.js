@@ -1,6 +1,7 @@
 class Player {
 
   static SPEED = 10;
+  static MAX_RADIUS = 15;
 
   constructor({ x, y, radius, color }) {
     this.x = x

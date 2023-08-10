@@ -27,6 +27,7 @@ io.on('connection', socket => {
         x: 100 + Math.round(Math.random() * 500),
         y: 100 + Math.round(Math.random() * 500),
         radius: 10,
+        health: 100,
         color: `hsl(${Math.random() * 360}, 100%, 50%)`,
         sequenceNumber: 0,
     }
@@ -106,6 +107,11 @@ setInterval(() => {
             console.log(di, backEndPlayer.radius, PROJECTILE_RADIUS);
             if (di <= backEndPlayer.radius + PROJECTILE_RADIUS) {
                 delete backEndProjectiles[id];
+                backEndPlayer.health -= 25;
+                if (backEndPlayer.health === 0) {
+                    delete backEndPlayers[playerId];
+                }
+                break;
             }
         }
     }
