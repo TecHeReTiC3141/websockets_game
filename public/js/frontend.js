@@ -6,6 +6,16 @@ const scoreEl = document.querySelector('#scoreEl')
 const devicePixelRatio = window.devicePixelRatio || 1
 
 const socket = io();
+
+
+socket.on('connect', () => {
+    socket.emit('initCanvas', {
+        width: canvas.width,
+        height: canvas.height,
+        devicePixelRatio
+    });
+})
+
 socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in backEndPlayers) {
         const {x, y, radius, color} = backEndPlayers[id];
