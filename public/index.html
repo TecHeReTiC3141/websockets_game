@@ -1,38 +1,46 @@
 <html>
-  <head>
-    <style>
-      body {
-        margin: 0;
-      }
-      canvas {
-          width: 100%;
-          height: 100%;
-      }
-    </style>
-    <title>Multiplayer shooter game</title>
-    <meta lang="en">
-  </head>
-  <body>
+    <head>
+        <style>
+            body {
+                margin: 0;
+            }
+            canvas {
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+        <title>Multiplayer shooter game</title>
+        <meta lang="en">
+    </head>
+    <body>
 
     <div class="leaderboard">
-      <h2 class="title">LeaderBoard</h2>
-      <ul class="players">
+        <h2 class="title">LeaderBoard</h2>
+        <ul class="players">
 
-      </ul>
+        </ul>
     </div>
+
+    <div class="username-container">
+        <form action="" method="get">
+            <input type="text" placeholder="Username" id="name" name="name">
+            <button>Start!</button>
+        </form>
+    </div>
+
 
     <canvas></canvas>
 
     <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
-      integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
+            src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
+            integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
     ></script>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.js"
-    integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
-    crossorigin="anonymous"></script>
+            integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
+            crossorigin="anonymous"></script>
     <script src="js/classes/Enemy.js"></script>
     <script src="js/classes/Player.js"></script>
     <script src="js/classes/Particle.js"></script>
@@ -41,5 +49,5 @@
     <script src="js/eventListeners.js"></script>
 
     <link rel="stylesheet" href="./css/main.css" type="text/css">
-  </body>
+    </body>
 </html>
