@@ -1,9 +1,14 @@
 window.addEventListener('click', (event) => {
     const currentPlayer = frontEndPlayers[socket.id];
+    const canvas = document.querySelector('canvas');
+    const { top, left } = canvas.getBoundingClientRect();
+
     const angle = Math.atan2(
-        event.clientY - currentPlayer.y,
-        event.clientX - currentPlayer.x
+        event.clientY - top - currentPlayer.y,
+        event.clientX - left - currentPlayer.x
     )
+
+
     const velocity = {
         x: Math.cos(angle),
         y: Math.sin(angle)

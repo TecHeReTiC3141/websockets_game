@@ -12,6 +12,7 @@ const hslToHex = require('./utils/color_converter')
 
 const port = 3000
 const PLAYER_SPEED = 10, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
+const CANVAS_WIDTH = 1024, CANVAS_HEIGHT = 576;
 
 app.use(express.static('public'))
 
@@ -34,8 +35,8 @@ io.on('connection', socket => {
     socket.on('startGame', ({ username, width, height, devicePixelRatio }) => {
         const hue = Math.random() * 360
         backEndPlayers[socket.id] = {
-            x: 100 + Math.round(Math.random() * 700),
-            y: 50 + Math.round(Math.random() * 500),
+            x: Math.round(Math.random() * CANVAS_WIDTH),
+            y: Math.round(Math.random() * CANVAS_HEIGHT),
             radius: 10,
             health: 100,
             color: `hsl(${hue}, 100%, 50%)`,

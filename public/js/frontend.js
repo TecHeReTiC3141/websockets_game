@@ -94,8 +94,8 @@ let animationId
 
 function animate() {
     animationId = requestAnimationFrame(animate)
-    c.fillStyle = 'rgba(0, 0, 0, 0.1)'
-    c.fillRect(0, 0, canvas.width, canvas.height)
+    // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
+    c.clearRect(0, 0, canvas.width, canvas.height)
     for (let playerId in frontEndPlayers) {
         let player = frontEndPlayers[playerId];
         player.draw()

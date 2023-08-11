@@ -14,10 +14,21 @@ class Player {
   }
 
   draw() {
+    c.font = '12px sans-serif'
+    c.fillStyle = 'white'
+
+    c.fillText(this.username,
+        this.x - (this.username.length - 2) * 4,
+        this.y + this.radius + 15)
+    c.save()
+    c.shadowColor = this.color;
+    c.shadowBlur = 25;
     c.beginPath()
     c.arc(this.x, this.y, this.radius,
       0, Math.PI * 2, false)
     c.fillStyle = this.color
     c.fill()
+
+    c.restore()
   }
 }
