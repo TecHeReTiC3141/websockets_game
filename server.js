@@ -62,19 +62,25 @@ io.on('connection', socket => {
     })
 
     socket.on('keydown', ({ direction, sequenceNumber }) => {
-        backEndPlayers[socket.id].sequenceNumber = sequenceNumber;
+        const currentPlayer = backEndPlayers[socket.id]
+        currentPlayer.sequenceNumber = sequenceNumber;
+
         switch (direction) {
             case "left":
-                backEndPlayers[socket.id].x -= PLAYER_SPEED
+                currentPlayer.x = Math.max(currentPlayer.radius * 2,
+                    currentPlayer.x - PLAYER_SPEED)
                 break
             case "right":
-                backEndPlayers[socket.id].x += PLAYER_SPEED
+                currentPlayer.x = Math.min(CANVAS_WIDTH - currentPlayer.radius * 2,
+                    currentPlayer.x + PLAYER_SPEED)
                 break
             case "up":
-                backEndPlayers[socket.id].y -= PLAYER_SPEED
+                currentPlayer.y = Math.max(currentPlayer.radius * 2,
+                    currentPlayer.y - PLAYER_SPEED)
                 break
             case "down":
-                backEndPlayers[socket.id].y += PLAYER_SPEED
+                currentPlayer.y = Math.min(CANVAS_HEIGHT - currentPlayer.radius * 2,
+                    currentPlayer.y + PLAYER_SPEED)
                 break
         }
     })

@@ -127,24 +127,29 @@ const playerInputs = [];
 let sequenceNumber = 0;
 
 setInterval(() => {
-    if (keys.d.pressed) {
+    const currentPlayer = frontEndPlayers[socket.id]
+    if (keys.d.pressed && currentPlayer.x < canvas.width - currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: Player.SPEED, dy: 0})
-        frontEndPlayers[socket.id].x += Player.SPEED;
+        currentPlayer.x = Math.min(canvas.width - currentPlayer.radius * 2,
+            currentPlayer.x + Player.SPEED)
         socket.emit('keydown', {direction: 'right', sequenceNumber});
     }
-    if (keys.a.pressed) {
+    if (keys.a.pressed && currentPlayer.x > currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: -Player.SPEED, dy: 0})
-        frontEndPlayers[socket.id].x -= Player.SPEED
+        currentPlayer.x = Math.max(currentPlayer.radius * 2,
+            currentPlayer.x - Player.SPEED)
         socket.emit('keydown', {direction: 'left', sequenceNumber});
     }
-    if (keys.w.pressed) {
+    if (keys.w.pressed && currentPlayer.y > currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: -Player.SPEED})
-        frontEndPlayers[socket.id].y -= Player.SPEED
         socket.emit('keydown', {direction: 'up', sequenceNumber});
+        currentPlayer.y = Math.max(currentPlayer.radius * 2,
+            currentPlayer.y - Player.SPEED)
     }
-    if (keys.s.pressed) {
+    if (keys.s.pressed && currentPlayer.y < canvas.height - currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: Player.SPEED})
-        frontEndPlayers[socket.id].y += Player.SPEED
+        currentPlayer.y = Math.min(canvas.height - currentPlayer.radius * 2,
+            currentPlayer.y + Player.SPEED)
         socket.emit('keydown', {direction: 'down', sequenceNumber});
     }
 }, 15);
