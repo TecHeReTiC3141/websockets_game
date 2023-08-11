@@ -48,27 +48,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
         }
     }
 
-    $('.players').empty();
-    const leaderboardData = [];
-    for (let id in frontEndPlayers) {
-        leaderboardData.push({
-            name: frontEndPlayers[id].username,
-            score: frontEndPlayers[id].score,
-            avatarApiUrl: frontEndPlayers[id].avatarUrl.toString(),
-
-        })
-
-    }
-
-    leaderboardData.sort((a, b) => {
-        return b.score - a.score;
-    }).forEach((player, ind) => {
-        const newItem =
-            $(`<li><p>${ind + 1}. <img src=${player.avatarApiUrl}
-" alt="avatar" class="avatar"> ${player.name} - ${player.score}</p></li>`);
-        $('.players').append(newItem);
-    });
-
 })
 
 socket.on('updateProjectiles', (backEndProjectiles) => {
@@ -167,6 +146,28 @@ setInterval(() => {
         socket.emit('keydown', {direction: 'down', sequenceNumber});
     }
 }, 15);
+
+// updating leaderboard
+setInterval(() => {
+    $('.players').empty();
+    const leaderboardData = [];
+    for (let id in frontEndPlayers) {
+        leaderboardData.push({
+            name: frontEndPlayers[id].username,
+            score: frontEndPlayers[id].score,
+            avatarUrl: frontEndPlayers[id].avatarUrl.toString(),
+        })
+    }
+
+    leaderboardData.sort((a, b) => {
+        return b.score - a.score;
+    }).forEach((player, ind) => {
+        const newItem =
+            $(`<li><p>${ind + 1}. <img src=${player.avatarUrl}
+" alt="avatar" class="avatar"> ${player.name} - ${player.score}</p></li>`);
+        $('.players').append(newItem);
+    });
+}, 60);
 
 window.addEventListener('keydown', ev => {
     if (!frontEndPlayers[socket.id] || !(ev.key in keys)) return;

@@ -25,6 +25,17 @@ body {
     text-align: center;
 }
 
+.leaderboard .players li p {
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+    margin-bottom: .5rem;
+}
+
+.leaderboard .players li:first-child {
+    color: gold;
+}
+
 .username-container {
     position: absolute;
     top: 50%;
@@ -77,5 +88,6 @@ body {
 .avatar {
     width: 1.25rem;
     height: auto;
+    border-radius: .5rem;
 }
 
