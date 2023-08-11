@@ -1,6 +1,6 @@
 // TODO: add fixed map on canvas, then render only certain area around player
-// TODO: add avatars to players via API
-
+// TODO: display players' names above them
+// TODO: add particles when player is hit
 
 const express = require('express')
 const app = express()
@@ -34,8 +34,8 @@ io.on('connection', socket => {
     socket.on('startGame', ({ username, width, height, devicePixelRatio }) => {
         const hue = Math.random() * 360
         backEndPlayers[socket.id] = {
-            x: 100 + Math.round(Math.random() * 500),
-            y: 100 + Math.round(Math.random() * 500),
+            x: 100 + Math.round(Math.random() * 700),
+            y: 50 + Math.round(Math.random() * 500),
             radius: 10,
             health: 100,
             color: `hsl(${hue}, 100%, 50%)`,
@@ -58,9 +58,6 @@ io.on('connection', socket => {
         }
 
         backEndPlayers[socket.id].radius = PLAYER_RADIUS;
-        if (devicePixelRatio > 1) {
-            backEndPlayers[socket.id].radius *= 2
-        }
     })
 
     socket.on('keydown', ({ direction, sequenceNumber }) => {

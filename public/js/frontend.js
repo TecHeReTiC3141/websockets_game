@@ -74,12 +74,14 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
     }
 })
 
-canvas.width = innerWidth * devicePixelRatio
-canvas.height = innerHeight * devicePixelRatio
+canvas.width = 1024 * devicePixelRatio
+canvas.height = 576 * devicePixelRatio
+
+c.scale(devicePixelRatio, devicePixelRatio);
 
 window.addEventListener('resize', () => {
-    canvas.width = innerWidth
-    canvas.height = innerHeight
+    canvas.width = 1024 * devicePixelRatio
+    canvas.height = 576 * devicePixelRatio
 })
 
 const x = canvas.width / 2

@@ -4,8 +4,21 @@
     box-sizing: border-box;
 }
 
+
+canvas {
+    width: 1024px;
+    height: 576px;
+}
+
 body {
     font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    position: relative;
 }
 
 .leaderboard {
