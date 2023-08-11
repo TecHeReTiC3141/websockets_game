@@ -9,9 +9,10 @@ const socket = io();
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in backEndPlayers) {
-        const {x, y, radius, color, health, score, username } = backEndPlayers[id];
+        const {x, y, radius, color, health, score, username, avatarUrl } = backEndPlayers[id];
         if (!frontEndPlayers[id]) {
-            frontEndPlayers[id] = new Player({x, y, radius, color, username});
+            frontEndPlayers[id] = new Player(
+                {x, y, radius, color, username, avatarUrl});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             frontEndPlayers[id].score = score;
@@ -53,6 +54,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         leaderboardData.push({
             name: frontEndPlayers[id].username,
             score: frontEndPlayers[id].score,
+            avatarApiUrl: frontEndPlayers[id].avatarUrl.toString(),
+
         })
 
     }
@@ -61,7 +64,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
         return b.score - a.score;
     }).forEach((player, ind) => {
         const newItem =
-            $(`<li>${ind}. ${player.name} - ${player.score}</li>`);
+            $(`<li><p>${ind + 1}. <img src=${player.avatarApiUrl}
+" alt="avatar" class="avatar"> ${player.name} - ${player.score}</p></li>`);
         $('.players').append(newItem);
     });
 

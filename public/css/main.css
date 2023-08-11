@@ -74,3 +74,8 @@ body {
     box-shadow: none;
 }
 
+.avatar {
+    width: 1.25rem;
+    height: auto;
+}
+

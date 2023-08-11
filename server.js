@@ -1,4 +1,5 @@
 // TODO: add fixed map on canvas, then render only certain area around player
+// TODO: add avatars to players via API
 
 
 const express = require('express')
@@ -7,6 +8,7 @@ const http = require('http')
 const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
+const hslToHex = require('./utils/color_converter')
 
 const port = 3000
 const PLAYER_SPEED = 10, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
@@ -21,6 +23,8 @@ const backEndPlayers = {};
 const backEndProjectiles = {};
 let projectileId = 0;
 
+const AVATAR_API = "https://avatar.oxro.io/avatar.svg";
+
 io.on('connection', socket => {
     console.log('a user connected');
 
@@ -28,19 +32,31 @@ io.on('connection', socket => {
     io.emit('updatePlayers', backEndPlayers);
 
     socket.on('startGame', ({ username, width, height, devicePixelRatio }) => {
+        const hue = Math.random() * 360
         backEndPlayers[socket.id] = {
             x: 100 + Math.round(Math.random() * 500),
             y: 100 + Math.round(Math.random() * 500),
             radius: 10,
             health: 100,
-            color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+            color: `hsl(${hue}, 100%, 50%)`,
             sequenceNumber: 0,
             score: 0,
             username,
             canvas: {
                 width, height,
-            }
+            },
+            avatarUrl: new URL(AVATAR_API),
         }
+
+        const params = {
+            background: hslToHex(hue, 100, 50),
+            name: username,
+            rounded: 8,
+        }
+        for (const [key, value] of Object.entries(params)) {
+            backEndPlayers[socket.id].avatarUrl.searchParams.append(key, value);
+        }
+
         backEndPlayers[socket.id].radius = PLAYER_RADIUS;
         if (devicePixelRatio > 1) {
             backEndPlayers[socket.id].radius *= 2
