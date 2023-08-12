@@ -9,15 +9,17 @@ const socket = io();
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in backEndPlayers) {
-        const {x, y, radius, color, health, score, username } = backEndPlayers[id];
+        const {x, y, radius, color, health, score, username, avatarUrl } = backEndPlayers[id];
         if (!frontEndPlayers[id]) {
-            frontEndPlayers[id] = new Player({x, y, radius, color, username});
+            frontEndPlayers[id] = new Player(
+                {x, y, radius, color, username, avatarUrl});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             frontEndPlayers[id].score = score;
+            frontEndPlayers[id].target = {
+                x, y
+            }
             if (id === socket.id) {
-                frontEndPlayers[id].x = x;
-                frontEndPlayers[id].y = y;
                 const lastServerInputIndex = playerInputs.findIndex(input => {
                     return backEndPlayers[id].sequenceNumber === input.sequenceNumber;
                 })
@@ -25,8 +27,8 @@ socket.on('updatePlayers', (backEndPlayers) => {
                     playerInputs.splice(0, lastServerInputIndex + 1);
                 }
                 for (let input of playerInputs) {
-                    frontEndPlayers[id].x += input.dx;
-                    frontEndPlayers[id].y += input.dy;
+                    frontEndPlayers[id].target.x += input.dx;
+                    frontEndPlayers[id].target.y += input.dy;
                 }
             } else {
                 gsap.to(frontEndPlayers[id], {
@@ -46,24 +48,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
             delete frontEndPlayers[id];
         }
     }
-
-    $('.players').empty();
-    const leaderboardData = [];
-    for (let id in frontEndPlayers) {
-        leaderboardData.push({
-            name: frontEndPlayers[id].username,
-            score: frontEndPlayers[id].score,
-        })
-
-    }
-
-    leaderboardData.sort((a, b) => {
-        return b.score - a.score;
-    }).forEach((player, ind) => {
-        const newItem =
-            $(`<li>${ind}. ${player.name} - ${player.score}</li>`);
-        $('.players').append(newItem);
-    });
 
 })
 
@@ -91,12 +75,14 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
     }
 })
 
-canvas.width = innerWidth * devicePixelRatio
-canvas.height = innerHeight * devicePixelRatio
+canvas.width = 1024 * devicePixelRatio
+canvas.height = 576 * devicePixelRatio
+
+c.scale(devicePixelRatio, devicePixelRatio);
 
 window.addEventListener('resize', () => {
-    canvas.width = innerWidth
-    canvas.height = innerHeight
+    canvas.width = 1024 * devicePixelRatio
+    canvas.height = 576 * devicePixelRatio
 })
 
 const x = canvas.width / 2
@@ -109,10 +95,15 @@ let animationId
 
 function animate() {
     animationId = requestAnimationFrame(animate)
-    c.fillStyle = 'rgba(0, 0, 0, 0.1)'
-    c.fillRect(0, 0, canvas.width, canvas.height)
+    // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
+    c.clearRect(0, 0, canvas.width, canvas.height)
     for (let playerId in frontEndPlayers) {
-        let player = frontEndPlayers[playerId];
+        let player = frontEndPlayers[playerId]
+
+        if (player.target) {
+            player.x += (player.target.x - player.x) * .5
+            player.y += (player.target.y - player.y) * .5
+        }
         player.draw()
     }
     // // also could loop projectiles from the back to pop them in the same loop
@@ -142,27 +133,54 @@ const playerInputs = [];
 let sequenceNumber = 0;
 
 setInterval(() => {
-    if (keys.d.pressed) {
+    const currentPlayer = frontEndPlayers[socket.id]
+    if (keys.d.pressed && currentPlayer.x < canvas.width - currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: Player.SPEED, dy: 0})
-        frontEndPlayers[socket.id].x += Player.SPEED;
+        currentPlayer.x = Math.min(canvas.width - currentPlayer.radius * 2,
+            currentPlayer.x + Player.SPEED)
         socket.emit('keydown', {direction: 'right', sequenceNumber});
     }
-    if (keys.a.pressed) {
+    if (keys.a.pressed && currentPlayer.x > currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: -Player.SPEED, dy: 0})
-        frontEndPlayers[socket.id].x -= Player.SPEED
+        currentPlayer.x = Math.max(currentPlayer.radius * 2,
+            currentPlayer.x - Player.SPEED)
         socket.emit('keydown', {direction: 'left', sequenceNumber});
     }
-    if (keys.w.pressed) {
+    if (keys.w.pressed && currentPlayer.y > currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: -Player.SPEED})
-        frontEndPlayers[socket.id].y -= Player.SPEED
         socket.emit('keydown', {direction: 'up', sequenceNumber});
+        currentPlayer.y = Math.max(currentPlayer.radius * 2,
+            currentPlayer.y - Player.SPEED)
     }
-    if (keys.s.pressed) {
+    if (keys.s.pressed && currentPlayer.y < canvas.height - currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: Player.SPEED})
-        frontEndPlayers[socket.id].y += Player.SPEED
+        currentPlayer.y = Math.min(canvas.height - currentPlayer.radius * 2,
+            currentPlayer.y + Player.SPEED)
         socket.emit('keydown', {direction: 'down', sequenceNumber});
     }
 }, 15);
+
+// updating leaderboard
+setInterval(() => {
+    $('.players').empty();
+    const leaderboardData = [];
+    for (let id in frontEndPlayers) {
+        leaderboardData.push({
+            name: frontEndPlayers[id].username,
+            score: frontEndPlayers[id].score,
+            avatarUrl: frontEndPlayers[id].avatarUrl.toString(),
+        })
+    }
+
+    leaderboardData.sort((a, b) => {
+        return b.score - a.score;
+    }).forEach((player, ind) => {
+        const newItem =
+            $(`<li><p>${ind + 1}. <img src=${player.avatarUrl}
+" alt="avatar" class="avatar"> ${player.name} - ${player.score}</p></li>`);
+        $('.players').append(newItem);
+    });
+}, 60);
 
 window.addEventListener('keydown', ev => {
     if (!frontEndPlayers[socket.id] || !(ev.key in keys)) return;
