@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
 
 const backEndPlayers = {};
 const backEndProjectiles = {};
+const backEndParticles = {};
 let projectileId = 0;
 
 const AVATAR_API = "https://avatar.oxro.io/avatar.svg";

@@ -1,16 +1,19 @@
 const friction = 0.99
 class Particle {
-  constructor(x, y, radius, color, velocity) {
+  constructor({ x, y, radius, color, velocity, alpha = 1 }) {
     this.x = x
     this.y = y
     this.radius = radius
     this.color = color
     this.velocity = velocity
-    this.alpha = 1
+    this.alpha = alpha
   }
 
   draw() {
     mainCtx.save()
+    mainCtx.shadowColor = 'white';
+    mainCtx.shadowBlur = 10;
+
     mainCtx.globalAlpha = this.alpha
     mainCtx.beginPath()
     mainCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)

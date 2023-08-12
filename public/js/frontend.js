@@ -125,7 +125,6 @@ function animate() {
     }
 
     for (let part of frontEndParticles) {
-        part.draw()
         part.update()
     }
 
