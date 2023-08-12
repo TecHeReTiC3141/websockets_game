@@ -1,6 +1,6 @@
 class Player {
 
-    static SPEED = 10;
+    static SPEED = 8;
     static MAX_RADIUS = 15;
 
     constructor({x, y, radius, color, username, avatarUrl, score = 0}) {

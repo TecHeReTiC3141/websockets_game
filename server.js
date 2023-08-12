@@ -11,10 +11,8 @@ import { nanoid } from 'nanoid';
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 import { hslToHex } from './utils/color_converter.js'
 
-
-
 const port = 3000
-const PLAYER_SPEED = 10, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
+const PLAYER_SPEED = 8, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
 const CANVAS_WIDTH = 2048, CANVAS_HEIGHT = 1152;
 
 app.use(express.static('public'))
@@ -137,6 +135,23 @@ setInterval(() => {
                 delete backEndProjectiles[id];
                 backEndPlayer.health -= 25;
                 backEndPlayers[curProj.playerId].score += 25;
+                let partCount = 3 + Math.round(Math.random() * 5)
+                console.log(partCount)
+                while (partCount--) {
+                    const px = backEndPlayer.x + Math.random() * (2 * backEndPlayer.radius) - backEndPlayer.radius,
+                        py = backEndPlayer.y + Math.random() * (2 * backEndPlayer.radius) - backEndPlayer.radius,
+                        psx = -3 + Math.round(Math.random() * 6),
+                        psy = -3 + Math.round(Math.random() * 6)
+
+                    backEndParticles[nanoid()] = ({
+                        x: px,
+                        y: py,
+                        radius: Math.random() * 2 + backEndPlayer.radius / 2 - 1,
+                        color: backEndPlayer.color,
+                        alpha: 1,
+                        velocity: {x: psx, y: psy},
+                    });
+                }
                 if (backEndPlayer.health === 0) {
                     delete backEndPlayers[playerId];
                 }
@@ -157,15 +172,19 @@ setInterval(() => {
                 radius: Math.random() * 2 + curPlayer.radius / 2 - 1,
                 color: curPlayer.color,
                 alpha: 1,
+                velocity: {x: 0, y: 0},
             });
         }
     }
 
     for (let particleId in backEndParticles) {
-        backEndParticles[particleId].alpha -= .01
-        if (backEndParticles[particleId].alpha <= 0) {
+        const curPart = backEndParticles[particleId]
+        curPart.alpha -= .01
+        if (curPart.alpha <= 0) {
             delete backEndParticles[particleId];
         }
+        curPart.x += curPart.velocity.x;
+        curPart.y += curPart.velocity.y;
     }
 
     io.emit('updatePlayers', backEndPlayers);

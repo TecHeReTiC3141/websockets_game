@@ -83,7 +83,6 @@ socket.on('updateParticles', backEndParticle => {
     for (let id in backEndParticle) {
         frontEndParticles[id] = new Particle({
             ...backEndParticle[id],
-            velocity: {x: 0, y: 0},
         })
     }
 })
