@@ -30,12 +30,6 @@ socket.on('updatePlayers', (backEndPlayers) => {
                     frontEndPlayers[id].target.x += input.dx;
                     frontEndPlayers[id].target.y += input.dy;
                 }
-            } else {
-                gsap.to(frontEndPlayers[id], {
-                    x, y,
-                    duration: 0.015,
-                    ease: 'linear',
-                })
             }
         }
     }
