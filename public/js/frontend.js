@@ -79,6 +79,15 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
     }
 })
 
+socket.on('updateParticles', backEndParticle => {
+    for (let id in backEndParticle) {
+        frontEndParticles[id] = new Particle({
+            ...backEndParticle[id],
+            velocity: {x: 0, y: 0},
+        })
+    }
+})
+
 displayCanvas.width = window.innerWidth * devicePixelRatio
 displayCanvas.height = window.innerHeight * devicePixelRatio
 
@@ -97,7 +106,7 @@ const y = mainCanvas.height / 2
 
 const frontEndPlayers = {}
 let frontEndProjectiles = {};
-let frontEndParticles = [];
+let frontEndParticles = {};
 let sx, sy;
 
 let animationId
@@ -113,10 +122,8 @@ function animate() {
             player.x += (player.target.x - player.x) * .5
             player.y += (player.target.y - player.y) * .5
         }
-        const newPart = player.draw();
-        if (newPart) {
-            frontEndParticles.push(newPart)
-        }
+        player.draw();
+
     }
     // // also could loop projectiles from the back to pop them in the same loop
     for (let projectileId in frontEndProjectiles) {
@@ -124,8 +131,8 @@ function animate() {
         projectile.draw()
     }
 
-    for (let part of frontEndParticles) {
-        part.update()
+    for (let particleId in frontEndParticles) {
+        frontEndParticles[particleId].update()
     }
 
     mainCtx.strokeStyle = 'red';
@@ -144,7 +151,6 @@ function animate() {
         sy = Math.max(0,
             Math.min(mainCanvas.height - displayCanvas.height,
                 currentPlayer.y - displayCanvas.height / 2));
-        console.log(currentPlayer.x, currentPlayer.y, sx, sy, mainCanvas.width, mainCanvas.height);
     }
 
 

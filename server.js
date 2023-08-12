@@ -2,13 +2,16 @@
 // TODO: display players' names above them
 // TODO: add particles when player is hit
 
-const express = require('express')
+import express from 'express'
 const app = express()
-const http = require('http')
+import http from 'http'
 const server = http.createServer(app);
-const { Server } = require('socket.io');
+import { Server } from 'socket.io';
+import { nanoid } from 'nanoid';
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
-const hslToHex = require('./utils/color_converter')
+import { hslToHex } from './utils/color_converter.js'
+
+
 
 const port = 3000
 const PLAYER_SPEED = 10, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
@@ -142,9 +145,34 @@ setInterval(() => {
         }
     }
 
+    for (let playerId in backEndPlayers) {
+        const addParticle = Math.floor(Math.random() * 5)
+        if (!addParticle) {
+            const curPlayer = backEndPlayers[playerId];
+            const px = curPlayer.x + Math.random() * (2 * curPlayer.radius) - curPlayer.radius,
+                py = curPlayer.y + Math.random() * (2 * curPlayer.radius) - curPlayer.radius
+            backEndParticles[nanoid()] = ({
+                x: px,
+                y: py,
+                radius: Math.random() * 2 + curPlayer.radius / 2 - 1,
+                color: curPlayer.color,
+                alpha: 1,
+            });
+        }
+    }
+
+    for (let particleId in backEndParticles) {
+        backEndParticles[particleId].alpha -= .01
+        if (backEndParticles[particleId].alpha <= 0) {
+            delete backEndParticles[particleId];
+        }
+    }
+
     io.emit('updatePlayers', backEndPlayers);
     io.emit('updateProjectiles', backEndProjectiles);
+    io.emit('updateParticles', backEndParticles);
 }, 15);
+
 
 server.listen(port, () => {
     console.log(`Example app listening on http://localhost:${port}`)
