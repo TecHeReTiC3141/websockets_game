@@ -25,6 +25,6 @@ class Particle {
     this.velocity.y *= friction
     this.x = this.x + this.velocity.x
     this.y = this.y + this.velocity.y
-    this.alpha -= 0.01
+    this.alpha = Math.max(this.alpha - 0.01, 0)
   }
 }

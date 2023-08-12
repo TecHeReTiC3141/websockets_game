@@ -4,10 +4,9 @@ window.addEventListener('click', (event) => {
     const { top, left } = displayCanvas.getBoundingClientRect();
 
     const angle = Math.atan2(
-        event.clientY - top + sy - currentPlayer.y,
-        event.clientX - left + sx - currentPlayer.x
+        event.clientY + sy - top - currentPlayer.y,
+        event.clientX + sx - left - currentPlayer.x
     )
-
 
     const velocity = {
         x: Math.cos(angle),

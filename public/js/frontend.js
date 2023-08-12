@@ -97,6 +97,7 @@ const y = mainCanvas.height / 2
 
 const frontEndPlayers = {}
 let frontEndProjectiles = {};
+let frontEndParticles = [];
 let sx, sy;
 
 let animationId
@@ -112,12 +113,20 @@ function animate() {
             player.x += (player.target.x - player.x) * .5
             player.y += (player.target.y - player.y) * .5
         }
-        player.draw()
+        const newPart = player.draw();
+        if (newPart) {
+            frontEndParticles.push(newPart)
+        }
     }
     // // also could loop projectiles from the back to pop them in the same loop
     for (let projectileId in frontEndProjectiles) {
         let projectile = frontEndProjectiles[projectileId];
         projectile.draw()
+    }
+
+    for (let part of frontEndParticles) {
+        part.draw()
+        part.update()
     }
 
     mainCtx.strokeStyle = 'red';

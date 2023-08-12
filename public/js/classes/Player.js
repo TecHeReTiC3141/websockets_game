@@ -30,5 +30,14 @@ class Player {
     mainCtx.fill()
 
     mainCtx.restore()
+
+    const addParticle = Math.floor(Math.random() * 10)
+    if (!addParticle) {
+      const px = this.x + Math.random() * (2 * this.radius) - this.radius,
+          py = this.y + Math.random() * (2 * this.radius) - this.radius
+      return new Particle(px, py, Math.random() * this.radius / 2, this.color,
+          {x: 0, y: 0});
+    }
+
   }
 }
