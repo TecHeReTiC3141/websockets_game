@@ -63,7 +63,9 @@ io.on('connection', socket => {
 
     socket.on('keydown', ({ direction, sequenceNumber }) => {
         const currentPlayer = backEndPlayers[socket.id]
-        currentPlayer.sequenceNumber = sequenceNumber;
+        if (!currentPlayer) return
+
+        currentPlayer.sequenceNumber = sequenceNumber
 
         switch (direction) {
             case "left":
