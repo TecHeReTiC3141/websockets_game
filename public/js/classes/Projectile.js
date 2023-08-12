@@ -11,16 +11,16 @@ class Projectile {
   }
 
   draw() {
-    c.save()
+    mainCtx.save()
 
-    c.shadowColor = this.color
-    c.shadowBlur = 15
-    c.beginPath()
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-    c.fillStyle = this.color
-    c.fill()
+    mainCtx.shadowColor = this.color
+    mainCtx.shadowBlur = 15
+    mainCtx.beginPath()
+    mainCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+    mainCtx.fillStyle = this.color
+    mainCtx.fill()
 
-    c.restore()
+    mainCtx.restore()
   }
 
   update() {

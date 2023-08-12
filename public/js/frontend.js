@@ -1,11 +1,21 @@
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
+const MAIN_CANVAS_WIDTH = 2048, MAIN_CANVAS_HEIGHT = 1152;
+const DISPLAY_CANVAS_WIDTH = 1024, DISPLAY_CANVAS_HEIGHT = 576;
+
+const mainCanvas = document.querySelector('#mainCanvas')
+const mainCtx = mainCanvas.getContext('2d')
+
+console.log(mainCanvas.width, mainCanvas.height);
+const displayCanvas = document.querySelector('#displayCanvas')
+const displayCtx = displayCanvas.getContext('2d')
 
 const scoreEl = document.querySelector('#scoreEl')
 
 const devicePixelRatio = window.devicePixelRatio || 1
 
 const socket = io();
+
+const playerInputs = [];
+let sequenceNumber = 0;
 
 socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in backEndPlayers) {
@@ -69,28 +79,32 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
     }
 })
 
-canvas.width = 1024 * devicePixelRatio
-canvas.height = 576 * devicePixelRatio
+displayCanvas.width = window.innerWidth * devicePixelRatio
+displayCanvas.height = window.innerHeight * devicePixelRatio
 
-c.scale(devicePixelRatio, devicePixelRatio);
+mainCanvas.width = MAIN_CANVAS_WIDTH * devicePixelRatio
+mainCanvas.height = MAIN_CANVAS_HEIGHT * devicePixelRatio
+
+displayCtx.scale(devicePixelRatio, devicePixelRatio);
 
 window.addEventListener('resize', () => {
-    canvas.width = 1024 * devicePixelRatio
-    canvas.height = 576 * devicePixelRatio
+    displayCanvas.width = window.innerWidth * devicePixelRatio
+    displayCanvas.height = window.innerHeight * devicePixelRatio
 })
 
-const x = canvas.width / 2
-const y = canvas.height / 2
+const x = mainCanvas.width / 2
+const y = mainCanvas.height / 2
 
 const frontEndPlayers = {}
 let frontEndProjectiles = {};
+let sx, sy;
 
 let animationId
 
 function animate() {
     animationId = requestAnimationFrame(animate)
     // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
-    c.clearRect(0, 0, canvas.width, canvas.height)
+    mainCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height)
     for (let playerId in frontEndPlayers) {
         let player = frontEndPlayers[playerId]
 
@@ -105,6 +119,39 @@ function animate() {
         let projectile = frontEndProjectiles[projectileId];
         projectile.draw()
     }
+
+    mainCtx.strokeStyle = 'red';
+    mainCtx.lineWidth = 10;
+    mainCtx.strokeRect(0, 0, mainCanvas.width, mainCanvas.height);
+
+    const currentPlayer = frontEndPlayers[socket.id];
+
+    if (!currentPlayer) {
+        sx = 0
+        sy = 0
+    } else {
+        sx = Math.max(0,
+            Math.min(mainCanvas.width - displayCanvas.width,
+                currentPlayer.x - displayCanvas.width / 2))
+        sy = Math.max(0,
+            Math.min(mainCanvas.height - displayCanvas.height,
+                currentPlayer.y - displayCanvas.height / 2));
+        console.log(currentPlayer.x, currentPlayer.y, sx, sy, mainCanvas.width, mainCanvas.height);
+    }
+
+
+    displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height)
+    displayCtx.drawImage(
+        mainCanvas,
+        sx,
+        sy,
+        displayCanvas.width,
+        displayCanvas.height,
+        0,
+        0,
+        displayCanvas.width,
+        displayCanvas.height,
+    )
 }
 
 animate()
@@ -123,14 +170,13 @@ const keys = {
     },
 }
 
-const playerInputs = [];
-let sequenceNumber = 0;
+
 
 setInterval(() => {
     const currentPlayer = frontEndPlayers[socket.id]
-    if (keys.d.pressed && currentPlayer.x < canvas.width - currentPlayer.radius * 2) {
+    if (keys.d.pressed && currentPlayer.x < mainCanvas.width - currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: Player.SPEED, dy: 0})
-        currentPlayer.x = Math.min(canvas.width - currentPlayer.radius * 2,
+        currentPlayer.x = Math.min(mainCanvas.width - currentPlayer.radius * 2,
             currentPlayer.x + Player.SPEED)
         socket.emit('keydown', {direction: 'right', sequenceNumber});
     }
@@ -146,9 +192,9 @@ setInterval(() => {
         currentPlayer.y = Math.max(currentPlayer.radius * 2,
             currentPlayer.y - Player.SPEED)
     }
-    if (keys.s.pressed && currentPlayer.y < canvas.height - currentPlayer.radius * 2) {
+    if (keys.s.pressed && currentPlayer.y < mainCanvas.height - currentPlayer.radius * 2) {
         playerInputs.push({sequenceNumber: ++sequenceNumber, dx: 0, dy: Player.SPEED})
-        currentPlayer.y = Math.min(canvas.height - currentPlayer.radius * 2,
+        currentPlayer.y = Math.min(mainCanvas.height - currentPlayer.radius * 2,
             currentPlayer.y + Player.SPEED)
         socket.emit('keydown', {direction: 'down', sequenceNumber});
     }

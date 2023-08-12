@@ -12,7 +12,7 @@ const hslToHex = require('./utils/color_converter')
 
 const port = 3000
 const PLAYER_SPEED = 10, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
-const CANVAS_WIDTH = 1024, CANVAS_HEIGHT = 576;
+const CANVAS_WIDTH = 2048, CANVAS_HEIGHT = 1152;
 
 app.use(express.static('public'))
 
@@ -114,9 +114,9 @@ setInterval(() => {
         curProj.y += curProj.velocity.y;
 
         if (curProj.x - PROJECTILE_RADIUS >=
-                backEndPlayers[curProj.playerId]?.canvas?.width
+                CANVAS_WIDTH
             || curProj.y - PROJECTILE_RADIUS >=
-                backEndPlayers[curProj.playerId]?.canvas?.height
+                CANVAS_HEIGHT
             || curProj.x + PROJECTILE_RADIUS <= 0
             || curProj.y + PROJECTILE_RADIUS <= 0
         || !(curProj.playerId in backEndPlayers)) {

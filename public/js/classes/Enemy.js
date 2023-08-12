@@ -8,10 +8,10 @@ class Enemy {
   }
 
   draw() {
-    c.beginPath()
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-    c.fillStyle = this.color
-    c.fill()
+    mainCtx.beginPath()
+    mainCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+    mainCtx.fillStyle = this.color
+    mainCtx.fill()
   }
 
   update() {
