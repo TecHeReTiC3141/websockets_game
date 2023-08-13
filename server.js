@@ -1,5 +1,4 @@
-// TODO: render
-
+import 'dotenv/config'
 
 import express from 'express'
 const app = express()
@@ -10,9 +9,21 @@ import { nanoid } from 'nanoid';
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 import { hslToHex } from './utils/color_converter.js'
 
-const port = 3000
 const PLAYER_SPEED = 8, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
 const CANVAS_WIDTH = 3072, CANVAS_HEIGHT = 1728;
+
+import initializeConnection from "./utils/getDBInstance.js";
+
+const connection = initializeConnection();
+
+(async () => {
+    try {
+        await connection.authenticate();
+        console.log('Successfully connected to db');
+    } catch (err) {
+        console.log(`Error while connecting: ${err.message}`);
+    }
+})();
 
 app.use(express.static('public'))
 
@@ -189,6 +200,6 @@ setInterval(() => {
 }, 15);
 
 
-server.listen(port, () => {
-    console.log(`Example app listening on http://localhost:${port}`)
+server.listen(process.env.PORT || 3000, () => {
+    console.log(`Example app listening on http://localhost:${process.env.PORT || 3000}`)
 })
