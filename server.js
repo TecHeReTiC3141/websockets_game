@@ -65,7 +65,7 @@ io.on('connection', socket => {
             sequenceNumber: 0,
             score: 0,
             name: username,
-            avatarURL: avatarUrl.toString(),
+            avatarUrl: avatarUrl.toString(),
         })
     })
 

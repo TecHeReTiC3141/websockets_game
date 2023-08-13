@@ -1,6 +1,8 @@
 import { Sequelize, DataTypes } from 'sequelize';
 import initiateConnection from '../utils/getDBInstance.js';
 
+// TODO: add virtual field color
+
 const connection = initiateConnection();
 const Player = connection.define('Player', {
     id: {
@@ -48,7 +50,7 @@ const Player = connection.define('Player', {
         allowNull: false,
         defaultValue: 0
     },
-    avatarURL: {
+    avatarUrl: {
         type: DataTypes.STRING,
         allowNull: false,
     }
