@@ -15,15 +15,15 @@ const CANVAS_WIDTH = 3072, CANVAS_HEIGHT = 1728;
 import initializeConnection from "./utils/getDBInstance.js";
 
 const connection = initializeConnection();
+import Player from "./models/Player.js";
 
-(async () => {
-    try {
-        await connection.authenticate();
-        console.log('Successfully connected to db');
-    } catch (err) {
-        console.log(`Error while connecting: ${err.message}`);
-    }
-})();
+connection.authenticate()
+    .then(() => console.log('Successfully connected to db'))
+    .catch(err =>  console.log(`Error while connecting: ${err.message}`));
+
+connection.sync({ force: true })
+    .then('All databases successfully updated')
+    .catch(err =>  console.log(`Error while syncing db: ${err.message}`));
 
 app.use(express.static('public'))
 
@@ -45,7 +45,7 @@ io.on('connection', socket => {
     io.emit('updatePlayers', backEndPlayers);
 
     socket.on('startGame', ({ username, width, height, devicePixelRatio }) => {
-        const hue = Math.random() * 360
+        const hue = Math.round(Math.random() * 360)
         backEndPlayers[socket.id] = {
             x: Math.round(Math.random() * CANVAS_WIDTH),
             y: Math.round(Math.random() * CANVAS_HEIGHT),
