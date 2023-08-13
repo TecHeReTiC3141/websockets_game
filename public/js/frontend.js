@@ -1,3 +1,6 @@
+// TODO: render objects which only can be seen by player
+
+
 const MAIN_CANVAS_WIDTH = 3072, MAIN_CANVAS_HEIGHT = 1728;
 const DISPLAY_CANVAS_WIDTH = 1024, DISPLAY_CANVAS_HEIGHT = 576;
 
@@ -186,8 +189,6 @@ function animate() {
             Math.min(mainCanvas.height - displayCanvas.height,
                 currentPlayer.y - displayCanvas.height / 2));
     }
-
-
     displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height)
     displayCtx.drawImage(
         mainCanvas,

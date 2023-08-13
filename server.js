@@ -1,5 +1,4 @@
-// TODO: create pointers which point to other players
-//  which are out of display boundaries
+// TODO: render
 
 
 import express from 'express'
