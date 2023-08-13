@@ -43,40 +43,34 @@ const AVATAR_API = "https://avatar.oxro.io/avatar.svg";
 io.on('connection', socket => {
     logger.info('a user connected');
 
-
-    io.emit('updatePlayers', backEndPlayers);
-
-    socket.on('startGame', ({ username, width, height, devicePixelRatio }) => {
-        const hue = Math.round(Math.random() * 360)
-        backEndPlayers[socket.id] = {
-            x: Math.round(Math.random() * CANVAS_WIDTH),
-            y: Math.round(Math.random() * CANVAS_HEIGHT),
-            radius: 10,
-            health: 100,
-            color: `hsl(${hue}, 100%, 50%)`,
-            sequenceNumber: 0,
-            score: 0,
-            username,
-            canvas: {
-                width, height,
-            },
-            avatarUrl: new URL(AVATAR_API),
-        }
-
+    socket.on('startGame', async ({ username }) => {
+        const hue = Math.round(Math.random() * 360),
+            avatarUrl = new URL(AVATAR_API)
         const params = {
             background: hslToHex(hue, 100, 50),
             name: username,
             rounded: 8,
         }
         for (const [key, value] of Object.entries(params)) {
-            backEndPlayers[socket.id].avatarUrl.searchParams.append(key, value);
+            avatarUrl.searchParams.append(key, value);
         }
 
-        backEndPlayers[socket.id].radius = PLAYER_RADIUS;
+        await Player.create({
+            id: socket.id,
+            x: Math.round(Math.random() * CANVAS_WIDTH),
+            y: Math.round(Math.random() * CANVAS_HEIGHT),
+            radius: PLAYER_RADIUS,
+            health: 100,
+            color_hue: hue,
+            sequenceNumber: 0,
+            score: 0,
+            name: username,
+            avatarURL: avatarUrl.toString(),
+        })
     })
 
-    socket.on('keydown', ({ direction, sequenceNumber }) => {
-        const currentPlayer = backEndPlayers[socket.id]
+    socket.on('keydown', async ({ direction, sequenceNumber }) => {
+        const currentPlayer = await Player.findByPk(socket.id);
         if (!currentPlayer) return
 
         currentPlayer.sequenceNumber = sequenceNumber
@@ -99,6 +93,7 @@ io.on('connection', socket => {
                     currentPlayer.y + PLAYER_SPEED)
                 break
         }
+        await currentPlayer.save()
     })
 
     socket.on('shoot', ({ x, y, angle }) => {
@@ -112,74 +107,85 @@ io.on('connection', socket => {
         }
     })
 
-    socket.on('disconnect', reason => {
-        delete backEndPlayers[socket.id];
-        io.emit('updatePlayers', backEndPlayers);
+    socket.on('disconnect', async reason => {
+        await Player.destroy({
+            where: {
+                id: socket.id,
+            }
+        })
     })
 })
 
-setInterval(() => {
+async function updateBackend() {
+    const players = await Player.findAll()
     for (let id in backEndProjectiles) {
         const curProj = backEndProjectiles[id];
         curProj.x += curProj.velocity.x;
         curProj.y += curProj.velocity.y;
 
         if (curProj.x - PROJECTILE_RADIUS >=
-                CANVAS_WIDTH
+            CANVAS_WIDTH
             || curProj.y - PROJECTILE_RADIUS >=
-                CANVAS_HEIGHT
+            CANVAS_HEIGHT
             || curProj.x + PROJECTILE_RADIUS <= 0
             || curProj.y + PROJECTILE_RADIUS <= 0
-        || !(curProj.playerId in backEndPlayers)) {
+            || !(curProj.playerId in backEndPlayers)) {
             delete backEndProjectiles[id];
             continue;
         }
 
-        for (let playerId in backEndPlayers) {
-            if (playerId === curProj.playerId) continue;
-            const backEndPlayer = backEndPlayers[playerId];
-            const di = Math.hypot(backEndPlayer.x - curProj.x,
-                backEndPlayer.y - curProj.y);
-            if (di <= backEndPlayer.radius + PROJECTILE_RADIUS) {
+        for (let player of players) {
+            if (player.id === curProj.playerId) continue;
+            const di = Math.hypot(player.x - curProj.x,
+                player.y - curProj.y);
+            if (di <= player.radius + PROJECTILE_RADIUS) {
                 delete backEndProjectiles[id];
-                backEndPlayer.health -= 25;
-                backEndPlayers[curProj.playerId].score += 25;
+                player.health -= 25;
+                await player.save()
+
+                const projOwner = await Player.findByPk(curProj.playerId)
+                projOwner.score += 25;
+                await projOwner.save()
+
                 let partCount = 3 + Math.round(Math.random() * 5)
-                console.log(partCount)
+
                 while (partCount--) {
-                    const px = backEndPlayer.x + Math.random() * (2 * backEndPlayer.radius) - backEndPlayer.radius,
-                        py = backEndPlayer.y + Math.random() * (2 * backEndPlayer.radius) - backEndPlayer.radius,
+                    const px = player.x + Math.random() * (2 * player.radius) - player.radius,
+                        py = player.y + Math.random() * (2 * player.radius) - player.radius,
                         psx = -3 + Math.round(Math.random() * 6),
                         psy = -3 + Math.round(Math.random() * 6)
 
                     backEndParticles[nanoid()] = ({
                         x: px,
                         y: py,
-                        radius: Math.random() * 2 + backEndPlayer.radius / 2 - 1,
-                        color: backEndPlayer.color,
+                        radius: Math.random() * 2 + player.radius / 2 - 1,
+                        color: player.color,
                         alpha: 1,
                         velocity: {x: psx, y: psy},
                     });
                 }
-                if (backEndPlayer.health === 0) {
-                    delete backEndPlayers[playerId];
+                if (player.health === 0) {
+                    await Player.destroy({
+                        where: {
+                            id: socket.id,
+                        }
+                    })
                 }
                 break;
             }
         }
     }
 
-    for (let playerId in backEndPlayers) {
+    for (let player of players) {
         const addParticle = Math.floor(Math.random() * 5)
         if (!addParticle) {
-            const curPlayer = backEndPlayers[playerId];
-            const px = curPlayer.x + Math.random() * (2 * curPlayer.radius) - curPlayer.radius,
-                py = curPlayer.y + Math.random() * (2 * curPlayer.radius) - curPlayer.radius
+            const px = player.x + Math.random() * (2 * player.radius) - player.radius,
+                py = player.y + Math.random() * (2 * player.radius) - player.radius
             backEndParticles[nanoid()] = ({
                 x: px,
                 y: py,
-                radius: Math.random() * 2 + curPlayer.radius / 2 - 1,
-                color: curPlayer.color,
+                radius: Math.random() * 2 + player.radius / 2 - 1,
+                color: player.color,
                 alpha: 1,
                 velocity: {x: 0, y: 0},
             });
@@ -195,10 +201,22 @@ setInterval(() => {
         curPart.x += curPart.velocity.x;
         curPart.y += curPart.velocity.y;
     }
+    logger.debug(players.map(player => player.toJSON()));
+    return {
+        players: players.map(player => player.toJSON()),
+    }
+}
 
-    io.emit('updatePlayers', backEndPlayers);
-    io.emit('updateProjectiles', backEndProjectiles);
-    io.emit('updateParticles', backEndParticles);
+setInterval(async () => {
+    try {
+        const { players } = await updateBackend()
+        io.emit('updatePlayers', players);
+        io.emit('updateProjectiles', backEndProjectiles);
+        io.emit('updateParticles', backEndParticles);
+    } catch (err) {
+        logger.error(err.message)
+    }
+
 }, 15);
 
 

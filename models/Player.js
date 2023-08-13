@@ -7,6 +7,10 @@ const Player = connection.define('Player', {
         type: DataTypes.STRING,
         primaryKey: true,
     },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     x: {
         type: DataTypes.INTEGER,
         allowNull: false,

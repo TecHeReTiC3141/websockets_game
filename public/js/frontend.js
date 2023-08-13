@@ -19,11 +19,16 @@ const playerInputs = [];
 let sequenceNumber = 0;
 
 socket.on('updatePlayers', (backEndPlayers) => {
-    for (let id in backEndPlayers) {
-        const {x, y, radius, color, health, score, username, avatarUrl } = backEndPlayers[id];
+    let backendIds = new Set()
+    for (let backEndPlayer of backEndPlayers) {
+        console.log(backEndPlayer)
+        const {id, x, y, radius, color_hue, health, score,
+            name, avatarUrl, sequenceNumber } = backEndPlayer;
+        backendIds.add(id);
         if (!frontEndPlayers[id]) {
             frontEndPlayers[id] = new Player(
-                {x, y, radius, color, username, avatarUrl});
+                {x, y, radius, color: `hsl(${color_hue}, 100%, 50%)`,
+                    name, avatarUrl});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             frontEndPlayers[id].score = score;
@@ -32,7 +37,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
             }
             if (id === socket.id) {
                 const lastServerInputIndex = playerInputs.findIndex(input => {
-                    return backEndPlayers[id].sequenceNumber === input.sequenceNumber;
+                    return sequenceNumber === input.sequenceNumber;
                 })
                 if (lastServerInputIndex !== -1) {
                     playerInputs.splice(0, lastServerInputIndex + 1);
@@ -46,7 +51,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
 
     for (let id in frontEndPlayers) {
-        if (!backEndPlayers[id]) {
+        if (!backendIds.has(id)) {
             if (id === socket.id) {
                 document.querySelector('.username-container').style.display = 'block';
             }
@@ -255,9 +260,9 @@ setInterval(() => {
     const leaderboardData = [];
     for (let id in frontEndPlayers) {
         leaderboardData.push({
-            name: frontEndPlayers[id].username,
+            name: frontEndPlayers[id].name,
             score: frontEndPlayers[id].score,
-            avatarUrl: frontEndPlayers[id].avatarUrl.toString(),
+            avatarUrl: frontEndPlayers[id].avatarUrl,
         })
     }
 

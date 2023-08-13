@@ -26,9 +26,6 @@ usernameForm.addEventListener('submit', ev => {
     const username = usernameForm.querySelector('#name').value;
     socket.emit('startGame', {
         username,
-        width: mainCanvas.width,
-        height: mainCanvas.height,
-        devicePixelRatio
     });
     document.querySelector('.username-container').style.display = 'none';
 })
