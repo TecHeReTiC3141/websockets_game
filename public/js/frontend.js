@@ -1,10 +1,9 @@
-const MAIN_CANVAS_WIDTH = 2048, MAIN_CANVAS_HEIGHT = 1152;
+const MAIN_CANVAS_WIDTH = 3072, MAIN_CANVAS_HEIGHT = 1728;
 const DISPLAY_CANVAS_WIDTH = 1024, DISPLAY_CANVAS_HEIGHT = 576;
 
 const mainCanvas = document.querySelector('#mainCanvas')
 const mainCtx = mainCanvas.getContext('2d')
 
-console.log(mainCanvas.width, mainCanvas.height);
 const displayCanvas = document.querySelector('#displayCanvas')
 const displayCtx = displayCanvas.getContext('2d')
 
@@ -110,6 +109,42 @@ let sx, sy;
 
 let animationId
 
+function pointOtherPlayers() {
+    for (let playerId in frontEndPlayers) {
+        if (playerId === socket.id) continue;
+        const curPlayer = frontEndPlayers[playerId],
+            thisPlayer = frontEndPlayers[socket.id];
+        if (curPlayer.x + curPlayer.radius < sx ||
+            curPlayer.x - curPlayer.radius > sx + displayCanvas.width || curPlayer.y + curPlayer.radius < sy ||
+            curPlayer.y + curPlayer.radius > sy + displayCanvas.height) {
+            const dy = curPlayer.y - thisPlayer.y,
+                dx = curPlayer.x - thisPlayer.x,
+                px = displayCanvas.width / 2,
+                py = displayCanvas.height / 2, DELTA = 25
+            let pointerX, pointerY, coeff
+
+            if (Math.abs(dx / px) >= Math.abs(dy / py)) {
+                pointerX = dx >= 0 ? displayCanvas.width - DELTA : DELTA
+                coeff = Math.abs(px / dx);
+                pointerY = displayCanvas.height / 2 + coeff * dy
+            } else {
+                pointerY = dy >= 0 ? displayCanvas.height - DELTA : DELTA
+                coeff = Math.abs(py / dy);
+                pointerX = displayCanvas.width / 2 + coeff * dx
+            }
+            console.log(pointerX, pointerY, displayCanvas.width , displayCanvas.height)
+            displayCtx.fillStyle = curPlayer.color
+            displayCtx.beginPath()
+            displayCtx.moveTo(pointerX, pointerY)
+            displayCtx.lineTo(pointerX - 20, pointerY)
+            displayCtx.lineTo(pointerX - 10, pointerY - 20)
+            displayCtx.closePath()
+            displayCtx.fill()
+
+        }
+    }
+}
+
 function animate() {
     animationId = requestAnimationFrame(animate)
     // c.fillStyle = 'rgba(0, 0, 0, 0.1)'
@@ -165,6 +200,7 @@ function animate() {
         displayCanvas.width,
         displayCanvas.height,
     )
+    pointOtherPlayers();
 }
 
 animate()

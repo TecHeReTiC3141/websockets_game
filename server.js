@@ -1,6 +1,6 @@
-// TODO: add fixed map on canvas, then render only certain area around player
-// TODO: display players' names above them
-// TODO: add particles when player is hit
+// TODO: create pointers which point to other players
+//  which are out of display boundaries
+
 
 import express from 'express'
 const app = express()
@@ -13,7 +13,7 @@ import { hslToHex } from './utils/color_converter.js'
 
 const port = 3000
 const PLAYER_SPEED = 8, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
-const CANVAS_WIDTH = 2048, CANVAS_HEIGHT = 1152;
+const CANVAS_WIDTH = 3072, CANVAS_HEIGHT = 1728;
 
 app.use(express.static('public'))
 
@@ -98,15 +98,12 @@ io.on('connection', socket => {
             x, y, velocity,
             playerId: socket.id,
         }
-        console.log(backEndProjectiles);
     })
 
     socket.on('disconnect', reason => {
-        console.log(reason, socket.id);
         delete backEndPlayers[socket.id];
         io.emit('updatePlayers', backEndPlayers);
     })
-    console.log(backEndPlayers);
 })
 
 setInterval(() => {
