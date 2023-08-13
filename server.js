@@ -1,29 +1,31 @@
 import 'dotenv/config'
 
 import express from 'express'
-const app = express()
 import http from 'http'
-const server = http.createServer(app);
 import { Server } from 'socket.io';
 import { nanoid } from 'nanoid';
-const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 import { hslToHex } from './utils/color_converter.js'
+import { logger } from './utils/logger.js'
+
+const app = express()
+const server = http.createServer(app);
+const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 
 const PLAYER_SPEED = 8, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
 const CANVAS_WIDTH = 3072, CANVAS_HEIGHT = 1728;
 
 import initializeConnection from "./utils/getDBInstance.js";
-
-const connection = initializeConnection();
 import Player from "./models/Player.js";
 
+const connection = initializeConnection();
+
 connection.authenticate()
-    .then(() => console.log('Successfully connected to db'))
-    .catch(err =>  console.log(`Error while connecting: ${err.message}`));
+    .then(() => logger.info('Successfully connected to db'))
+    .catch(err =>  logger.error(`Error while connecting: ${err.message}`));
 
 connection.sync({ force: true })
-    .then('All databases successfully updated')
-    .catch(err =>  console.log(`Error while syncing db: ${err.message}`));
+    .then(() => logger.info('All databases successfully updated'))
+    .catch(err =>  logger.error(`Error while syncing db: ${err.message}`));
 
 app.use(express.static('public'))
 
@@ -39,7 +41,7 @@ let projectileId = 0;
 const AVATAR_API = "https://avatar.oxro.io/avatar.svg";
 
 io.on('connection', socket => {
-    console.log('a user connected');
+    logger.info('a user connected');
 
 
     io.emit('updatePlayers', backEndPlayers);
@@ -201,5 +203,5 @@ setInterval(() => {
 
 
 server.listen(process.env.PORT || 3000, () => {
-    console.log(`Example app listening on http://localhost:${process.env.PORT || 3000}`)
+    logger.info(`Listening on http://localhost:${process.env.PORT || 3000}`)
 })
