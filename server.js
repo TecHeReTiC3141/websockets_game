@@ -1,18 +1,18 @@
-// TODO: add fixed map on canvas, then render only certain area around player
-// TODO: display players' names above them
-// TODO: add particles when player is hit
+// TODO: render
 
-const express = require('express')
+
+import express from 'express'
 const app = express()
-const http = require('http')
+import http from 'http'
 const server = http.createServer(app);
-const { Server } = require('socket.io');
+import { Server } from 'socket.io';
+import { nanoid } from 'nanoid';
 const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
-const hslToHex = require('./utils/color_converter')
+import { hslToHex } from './utils/color_converter.js'
 
 const port = 3000
-const PLAYER_SPEED = 10, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
-const CANVAS_WIDTH = 1024, CANVAS_HEIGHT = 576;
+const PLAYER_SPEED = 8, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
+const CANVAS_WIDTH = 3072, CANVAS_HEIGHT = 1728;
 
 app.use(express.static('public'))
 
@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
 
 const backEndPlayers = {};
 const backEndProjectiles = {};
+const backEndParticles = {};
 let projectileId = 0;
 
 const AVATAR_API = "https://avatar.oxro.io/avatar.svg";
@@ -96,15 +97,12 @@ io.on('connection', socket => {
             x, y, velocity,
             playerId: socket.id,
         }
-        console.log(backEndProjectiles);
     })
 
     socket.on('disconnect', reason => {
-        console.log(reason, socket.id);
         delete backEndPlayers[socket.id];
         io.emit('updatePlayers', backEndPlayers);
     })
-    console.log(backEndPlayers);
 })
 
 setInterval(() => {
@@ -114,9 +112,9 @@ setInterval(() => {
         curProj.y += curProj.velocity.y;
 
         if (curProj.x - PROJECTILE_RADIUS >=
-                backEndPlayers[curProj.playerId]?.canvas?.width
+                CANVAS_WIDTH
             || curProj.y - PROJECTILE_RADIUS >=
-                backEndPlayers[curProj.playerId]?.canvas?.height
+                CANVAS_HEIGHT
             || curProj.x + PROJECTILE_RADIUS <= 0
             || curProj.y + PROJECTILE_RADIUS <= 0
         || !(curProj.playerId in backEndPlayers)) {
@@ -133,6 +131,23 @@ setInterval(() => {
                 delete backEndProjectiles[id];
                 backEndPlayer.health -= 25;
                 backEndPlayers[curProj.playerId].score += 25;
+                let partCount = 3 + Math.round(Math.random() * 5)
+                console.log(partCount)
+                while (partCount--) {
+                    const px = backEndPlayer.x + Math.random() * (2 * backEndPlayer.radius) - backEndPlayer.radius,
+                        py = backEndPlayer.y + Math.random() * (2 * backEndPlayer.radius) - backEndPlayer.radius,
+                        psx = -3 + Math.round(Math.random() * 6),
+                        psy = -3 + Math.round(Math.random() * 6)
+
+                    backEndParticles[nanoid()] = ({
+                        x: px,
+                        y: py,
+                        radius: Math.random() * 2 + backEndPlayer.radius / 2 - 1,
+                        color: backEndPlayer.color,
+                        alpha: 1,
+                        velocity: {x: psx, y: psy},
+                    });
+                }
                 if (backEndPlayer.health === 0) {
                     delete backEndPlayers[playerId];
                 }
@@ -141,9 +156,38 @@ setInterval(() => {
         }
     }
 
+    for (let playerId in backEndPlayers) {
+        const addParticle = Math.floor(Math.random() * 5)
+        if (!addParticle) {
+            const curPlayer = backEndPlayers[playerId];
+            const px = curPlayer.x + Math.random() * (2 * curPlayer.radius) - curPlayer.radius,
+                py = curPlayer.y + Math.random() * (2 * curPlayer.radius) - curPlayer.radius
+            backEndParticles[nanoid()] = ({
+                x: px,
+                y: py,
+                radius: Math.random() * 2 + curPlayer.radius / 2 - 1,
+                color: curPlayer.color,
+                alpha: 1,
+                velocity: {x: 0, y: 0},
+            });
+        }
+    }
+
+    for (let particleId in backEndParticles) {
+        const curPart = backEndParticles[particleId]
+        curPart.alpha -= .01
+        if (curPart.alpha <= 0) {
+            delete backEndParticles[particleId];
+        }
+        curPart.x += curPart.velocity.x;
+        curPart.y += curPart.velocity.y;
+    }
+
     io.emit('updatePlayers', backEndPlayers);
     io.emit('updateProjectiles', backEndProjectiles);
+    io.emit('updateParticles', backEndParticles);
 }, 15);
+
 
 server.listen(port, () => {
     console.log(`Example app listening on http://localhost:${port}`)

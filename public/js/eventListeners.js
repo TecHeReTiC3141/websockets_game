@@ -1,13 +1,12 @@
 window.addEventListener('click', (event) => {
     const currentPlayer = frontEndPlayers[socket.id];
-    const canvas = document.querySelector('canvas');
-    const { top, left } = canvas.getBoundingClientRect();
+    const displayCanvas = document.querySelector('#displayCanvas');
+    const { top, left } = displayCanvas.getBoundingClientRect();
 
     const angle = Math.atan2(
-        event.clientY - top - currentPlayer.y,
-        event.clientX - left - currentPlayer.x
+        event.clientY + sy - top - currentPlayer.y,
+        event.clientX + sx - left - currentPlayer.x
     )
-
 
     const velocity = {
         x: Math.cos(angle),
@@ -27,8 +26,8 @@ usernameForm.addEventListener('submit', ev => {
     const username = usernameForm.querySelector('#name').value;
     socket.emit('startGame', {
         username,
-        width: canvas.width,
-        height: canvas.height,
+        width: mainCanvas.width,
+        height: mainCanvas.height,
         devicePixelRatio
     });
     document.querySelector('.username-container').style.display = 'none';

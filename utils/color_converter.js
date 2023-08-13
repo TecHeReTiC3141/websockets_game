@@ -1,4 +1,4 @@
-function hslToHex(h, s, l) {
+export function hslToHex(h, s, l) {
     l /= 100;
     const a = s * Math.min(l, 1 - l) / 100;
     const f = n => {
@@ -8,5 +8,3 @@ function hslToHex(h, s, l) {
     };
     return `${f(0)}${f(8)}${f(4)}`;
 }
-
-module.exports = hslToHex;
