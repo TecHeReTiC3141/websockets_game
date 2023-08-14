@@ -23,12 +23,11 @@ window.addEventListener('click', (event) => {
 const usernameForm = document.querySelector('.username-form');
 usernameForm.addEventListener('submit', ev => {
     ev.preventDefault();
-    const username = usernameForm.querySelector('#name').value;
+    const username = $('#name').val();
     socket.emit('startGame', {
         username,
-        width: mainCanvas.width,
-        height: mainCanvas.height,
-        devicePixelRatio
     });
-    document.querySelector('.username-container').style.display = 'none';
+    $('.username-container').css({display: 'none'});
+    $("#message-input").prop('disabled', false)
+        .prop('placeholder', "Write something and press enter");
 })

@@ -5,6 +5,7 @@
         </style>
         <title>Multiplayer shooter game</title>
         <meta lang="en">
+
     </head>
     <body>
         <div class="container">
@@ -23,12 +24,27 @@
                 </form>
             </div>
 
+            <div class="chat">
+                <div class="chat-header">
+                    <h3>Chat <i class="fa-regular fa-comment-dots"></i></h3>
+                    <button class="toggle-chat"><i class="fa-solid fa-caret-up"></i></button>
+                </div>
+                <div class="chat-content">
+                    <div class="messages"></div>
+                    <input type="text" name="message" id="message-input"
+                           placeholder="Start game first to unlock chat"
+                    disabled>
+
+                </div>
+            </div>
+
 
             <canvas id="displayCanvas"></canvas>
             <canvas id="mainCanvas"></canvas>
         </div>
 
-
+    <script src="https://kit.fontawesome.com/c9b4448de0.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script
             src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.2/gsap.min.js"
             integrity="sha512-kVlGhj2qFy+KBCFuvjBJTGUMxbdqJKs4yK2jh0e0VPhWUPiPC87bzm4THmaaIee3Oj7j6sDpTTgm2EPPiESqBg=="
@@ -44,8 +60,9 @@
     <script src="js/classes/Player.js"></script>
     <script src="js/classes/Particle.js"></script>
 
-    <script src='js/frontend.js'></script>
-    <script src="js/eventListeners.js"></script>
+    <script defer src='js/frontend.js'></script>
+    <script defer src="js/eventListeners.js"></script>
+    <script defer src="js/chat.js"></script>
 
     <link rel="stylesheet" href="./css/main.css" type="text/css">
     </body>

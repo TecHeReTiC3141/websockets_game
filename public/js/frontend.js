@@ -1,6 +1,5 @@
 // TODO: render objects which only can be seen by player
 
-
 const MAIN_CANVAS_WIDTH = 3072, MAIN_CANVAS_HEIGHT = 1728;
 const DISPLAY_CANVAS_WIDTH = 1024, DISPLAY_CANVAS_HEIGHT = 576;
 
@@ -20,11 +19,15 @@ const playerInputs = [];
 let sequenceNumber = 0;
 
 socket.on('updatePlayers', (backEndPlayers) => {
-    for (let id in backEndPlayers) {
-        const {x, y, radius, color, health, score, username, avatarUrl } = backEndPlayers[id];
+    let backendIds = new Set()
+    for (let backEndPlayer of backEndPlayers) {
+        const {id, x, y, radius, color, health, score,
+            name, avatarUrl, sequenceNumber } = backEndPlayer;
+        backendIds.add(id);
         if (!frontEndPlayers[id]) {
             frontEndPlayers[id] = new Player(
-                {x, y, radius, color, username, avatarUrl});
+                {x, y, radius, color,
+                    name, avatarUrl});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             frontEndPlayers[id].score = score;
@@ -33,7 +36,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
             }
             if (id === socket.id) {
                 const lastServerInputIndex = playerInputs.findIndex(input => {
-                    return backEndPlayers[id].sequenceNumber === input.sequenceNumber;
+                    return sequenceNumber === input.sequenceNumber;
                 })
                 if (lastServerInputIndex !== -1) {
                     playerInputs.splice(0, lastServerInputIndex + 1);
@@ -47,9 +50,11 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
 
     for (let id in frontEndPlayers) {
-        if (!backEndPlayers[id]) {
+        if (!backendIds.has(id)) {
             if (id === socket.id) {
-                document.querySelector('.username-container').style.display = 'block';
+                $('.username-container').css({display: 'none'});
+                $("#message-input").prop('disabled', true)
+                    .prop('placeholder', "Start game first to unlock chat");
             }
             delete frontEndPlayers[id];
         }
@@ -89,6 +94,27 @@ socket.on('updateParticles', backEndParticle => {
     }
 })
 
+function getMessage(message, playerId) {
+    const currentPlayer = frontEndPlayers[playerId];
+    if (!currentPlayer) {
+        return null;
+    }
+    return $(`<div class="message ${playerId === socket.id ? 'mine' : ''}">
+        <img src="${currentPlayer.avatarUrl}" class="avatar" alt="Player avatar">
+        <div>
+             <h5 class="message-sender">${currentPlayer.name}. ${new Date().toLocaleString()}</h5>
+            <p class="message-text">${message}</p>
+        </div>
+       
+    </div>`)
+}
+
+socket.on('addMessage', ({ message, playerId }) => {
+    $('.chat-content .messages').append(getMessage(message, playerId));
+    $('.chat-content').prop('scrollTop',
+        $('.chat-content').prop('scrollHeight'));
+})
+
 displayCanvas.width = window.innerWidth * devicePixelRatio
 displayCanvas.height = window.innerHeight * devicePixelRatio
 
@@ -120,10 +146,11 @@ function pointOtherPlayers() {
         if (curPlayer.x + curPlayer.radius < sx ||
             curPlayer.x - curPlayer.radius > sx + displayCanvas.width || curPlayer.y + curPlayer.radius < sy ||
             curPlayer.y + curPlayer.radius > sy + displayCanvas.height) {
-            const dy = curPlayer.y - thisPlayer.y,
-                dx = curPlayer.x - thisPlayer.x,
-                px = displayCanvas.width / 2,
-                py = displayCanvas.height / 2, DELTA = 25
+            const px = displayCanvas.width / 2,
+                py = displayCanvas.height / 2,
+                dy = curPlayer.y - (sy + py),
+                dx = curPlayer.x - (sx + px),
+                DELTA = 25
             let pointerX, pointerY, coeff
 
             if (Math.abs(dx / px) >= Math.abs(dy / py)) {
@@ -135,7 +162,6 @@ function pointOtherPlayers() {
                 coeff = Math.abs(py / dy);
                 pointerX = displayCanvas.width / 2 + coeff * dx
             }
-            console.log(pointerX, pointerY, displayCanvas.width , displayCanvas.height)
             displayCtx.fillStyle = curPlayer.color
             displayCtx.beginPath()
             displayCtx.moveTo(pointerX, pointerY)
@@ -220,8 +246,6 @@ const keys = {
     },
 }
 
-
-
 setInterval(() => {
     const currentPlayer = frontEndPlayers[socket.id]
     if (keys.d.pressed && currentPlayer.x < mainCanvas.width - currentPlayer.radius * 2) {
@@ -256,9 +280,9 @@ setInterval(() => {
     const leaderboardData = [];
     for (let id in frontEndPlayers) {
         leaderboardData.push({
-            name: frontEndPlayers[id].username,
+            name: frontEndPlayers[id].name,
             score: frontEndPlayers[id].score,
-            avatarUrl: frontEndPlayers[id].avatarUrl.toString(),
+            avatarUrl: frontEndPlayers[id].avatarUrl,
         })
     }
 
@@ -273,7 +297,7 @@ setInterval(() => {
 }, 60);
 
 window.addEventListener('keydown', ev => {
-    if (!frontEndPlayers[socket.id] || !(ev.key in keys)) return;
+    if (messageInput.is(':focus') || !frontEndPlayers[socket.id] || !(ev.key in keys)) return;
     keys[ev.key].pressed = true;
 })
 

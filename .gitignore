@@ -1,7 +1,5 @@
 .ds_store
 node_modules
 /.idea
-
-
-# Local Netlify folder
-.netlify
+/.env
+/app.log
