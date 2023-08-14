@@ -33,10 +33,13 @@ const Player = connection.define('Player', {
         defaultValue: 100
     },
 
-    color_hue: {
+    color: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: 100
+        defaultValue: 100,
+        get() {
+            return `hsl(${this.getDataValue('color')}, 100%, 50%)`;
+        }
     },
 
     sequenceNumber: {

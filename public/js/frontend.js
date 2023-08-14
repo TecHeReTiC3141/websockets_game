@@ -21,13 +21,12 @@ let sequenceNumber = 0;
 socket.on('updatePlayers', (backEndPlayers) => {
     let backendIds = new Set()
     for (let backEndPlayer of backEndPlayers) {
-        console.log(backEndPlayer)
-        const {id, x, y, radius, color_hue, health, score,
+        const {id, x, y, radius, color, health, score,
             name, avatarUrl, sequenceNumber } = backEndPlayer;
         backendIds.add(id);
         if (!frontEndPlayers[id]) {
             frontEndPlayers[id] = new Player(
-                {x, y, radius, color: `hsl(${color_hue}, 100%, 50%)`,
+                {x, y, radius, color,
                     name, avatarUrl});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;

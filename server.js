@@ -61,7 +61,7 @@ io.on('connection', socket => {
             y: Math.round(Math.random() * CANVAS_HEIGHT),
             radius: PLAYER_RADIUS,
             health: 100,
-            color_hue: hue,
+            color: hue,
             sequenceNumber: 0,
             score: 0,
             name: username,
@@ -105,6 +105,7 @@ io.on('connection', socket => {
             x, y, velocity,
             playerId: socket.id,
         }
+        logger.info(JSON.stringify(backEndProjectiles, null, 4))
     })
 
     socket.on('disconnect', async reason => {
@@ -120,6 +121,8 @@ async function updateBackend() {
     const players = await Player.findAll()
     for (let id in backEndProjectiles) {
         const curProj = backEndProjectiles[id];
+        const owner = await Player.findByPk(curProj.playerId);
+        if (!owner) continue;
         curProj.x += curProj.velocity.x;
         curProj.y += curProj.velocity.y;
 
@@ -128,8 +131,7 @@ async function updateBackend() {
             || curProj.y - PROJECTILE_RADIUS >=
             CANVAS_HEIGHT
             || curProj.x + PROJECTILE_RADIUS <= 0
-            || curProj.y + PROJECTILE_RADIUS <= 0
-            || !(curProj.playerId in backEndPlayers)) {
+            || curProj.y + PROJECTILE_RADIUS <= 0) {
             delete backEndProjectiles[id];
             continue;
         }
