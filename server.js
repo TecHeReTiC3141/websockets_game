@@ -1,3 +1,5 @@
+// TODO: fix problem when players are dying
+
 import 'dotenv/config'
 
 import express from 'express'
@@ -13,7 +15,6 @@ const io = new Server(server, { pingInterval: 2000, pingTimeout: 5000, } );
 
 const PLAYER_SPEED = 8, PLAYER_RADIUS = 10, PROJECTILE_SPEED = 5, PROJECTILE_RADIUS = 5;
 const CANVAS_WIDTH = 3072, CANVAS_HEIGHT = 1728;
-
 import initializeConnection from "./utils/getDBInstance.js";
 import Player from "./models/Player.js";
 
@@ -152,7 +153,6 @@ async function updateBackend() {
                 delete backEndProjectiles[id];
                 player.health -= 25;
                 await player.save()
-
                 const projOwner = await Player.findByPk(curProj.playerId)
                 projOwner.score += 25;
                 await projOwner.save()
@@ -177,9 +177,10 @@ async function updateBackend() {
                 if (player.health === 0) {
                     await Player.destroy({
                         where: {
-                            id: socket.id,
+                            id: player.id,
                         }
                     })
+                    logger.info(players.map(player => player.toJSON()))
                 }
                 break;
             }

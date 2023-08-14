@@ -52,7 +52,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in frontEndPlayers) {
         if (!backendIds.has(id)) {
             if (id === socket.id) {
-                $('.username-container').css({display: 'none'});
+                $('.username-container').css({display: 'block'});
                 $("#message-input").prop('disabled', true)
                     .prop('placeholder', "Start game first to unlock chat");
             }

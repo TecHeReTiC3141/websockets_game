@@ -137,12 +137,13 @@ body {
 }
 
 .chat-content {
-    background-color: rgba(255, 255, 255, .5);
+    background-color: #676666;
     border: 2px solid #3c3232;
     height: 0;
     transition: all linear .5s;
     overflow: auto;
     padding: 0 .5rem;
+    color: white;
 }
 
 .chat-content.open {
