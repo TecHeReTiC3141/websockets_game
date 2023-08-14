@@ -114,3 +114,62 @@ body {
     border-radius: .5rem;
 }
 
+.chat {
+    position: absolute;
+    left: .37rem;
+    bottom: 0;
+    width: 25rem;
+    max-width: 60%;
+    resize: horizontal;
+    overflow: auto;
+}
+
+.chat-header {
+    width: 100%;
+    background-color: lightgray;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem;
+    border-top-left-radius: .5rem;
+    border-top-right-radius: .5rem;
+    user-select: none;
+}
+
+.chat-content {
+    background-color: rgba(255, 255, 255, .5);
+    border: 2px solid #3c3232;
+    height: 0;
+    transition: all linear .5s;
+    overflow: auto;
+    padding: 0 .5rem;
+}
+
+.chat-content.open {
+    height: 20rem;
+}
+
+.toggle-chat {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.chat-content #message-input {
+    width: 100%;
+    padding: .5rem;
+    position: absolute;
+    border-radius: .5rem;
+    left: 0;
+    bottom: 0;
+    display: none;
+}
+
+.chat-content #message-input:focus {
+    outline: none;
+}
+
+.chat-content.open #message-input {
+    display: block;
+}
