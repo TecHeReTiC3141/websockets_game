@@ -92,6 +92,12 @@ socket.on('updateParticles', backEndParticle => {
     }
 })
 
+socket.on('addMessage', message => {
+    $('.chat-content .messages').append($(`<p>${message}</p>`));
+    $('.chat-content').prop('scrollTop',
+        $('.chat-content').prop('scrollHeight'));
+})
+
 displayCanvas.width = window.innerWidth * devicePixelRatio
 displayCanvas.height = window.innerHeight * devicePixelRatio
 

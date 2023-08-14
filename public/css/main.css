@@ -147,6 +147,7 @@ body {
 
 .chat-content.open {
     height: 20rem;
+    padding-bottom: 2rem;
 }
 
 .toggle-chat {

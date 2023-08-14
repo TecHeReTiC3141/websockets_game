@@ -108,6 +108,10 @@ io.on('connection', socket => {
         logger.info(JSON.stringify(backEndProjectiles, null, 4))
     })
 
+    socket.on('newMessage', ({ message }) => {
+        io.emit('addMessage', message)
+    })
+
     socket.on('disconnect', async reason => {
         await Player.destroy({
             where: {
@@ -116,6 +120,8 @@ io.on('connection', socket => {
         })
     })
 })
+
+
 
 async function updateBackend() {
     const players = await Player.findAll()
