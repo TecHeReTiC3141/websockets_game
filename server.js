@@ -122,13 +122,15 @@ io.on('connection', socket => {
 })
 
 
-
 async function updateBackend() {
     const players = await Player.findAll()
     for (let id in backEndProjectiles) {
         const curProj = backEndProjectiles[id];
         const owner = await Player.findByPk(curProj.playerId);
-        if (!owner) continue;
+        if (!owner) {
+            delete backEndProjectiles[id];
+            continue;
+        }
         curProj.x += curProj.velocity.x;
         curProj.y += curProj.velocity.y;
 

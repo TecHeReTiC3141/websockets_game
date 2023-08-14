@@ -99,7 +99,7 @@ function getMessage(message, playerId) {
     if (!currentPlayer) {
         return null;
     }
-    return $(`<div class="message">
+    return $(`<div class="message ${playerId === socket.id ? 'mine' : ''}">
         <img src="${currentPlayer.avatarUrl}" class="avatar" alt="Player avatar">
         <div>
              <h5 class="message-sender">${currentPlayer.name}. ${new Date().toLocaleString()}</h5>
@@ -146,10 +146,11 @@ function pointOtherPlayers() {
         if (curPlayer.x + curPlayer.radius < sx ||
             curPlayer.x - curPlayer.radius > sx + displayCanvas.width || curPlayer.y + curPlayer.radius < sy ||
             curPlayer.y + curPlayer.radius > sy + displayCanvas.height) {
-            const dy = curPlayer.y - thisPlayer.y,
-                dx = curPlayer.x - thisPlayer.x,
-                px = displayCanvas.width / 2,
-                py = displayCanvas.height / 2, DELTA = 25
+            const px = displayCanvas.width / 2,
+                py = displayCanvas.height / 2,
+                dy = curPlayer.y - (sy + py),
+                dx = curPlayer.x - (sx + px),
+                DELTA = 25
             let pointerX, pointerY, coeff
 
             if (Math.abs(dx / px) >= Math.abs(dy / py)) {
@@ -161,7 +162,6 @@ function pointOtherPlayers() {
                 coeff = Math.abs(py / dy);
                 pointerX = displayCanvas.width / 2 + coeff * dx
             }
-            console.log(pointerX, pointerY, displayCanvas.width , displayCanvas.height)
             displayCtx.fillStyle = curPlayer.color
             displayCtx.beginPath()
             displayCtx.moveTo(pointerX, pointerY)

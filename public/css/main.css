@@ -182,3 +182,15 @@ body {
     padding: .5rem;
     align-items: center;
 }
+
+.message.mine {
+    flex-direction: row-reverse;
+    justify-content: end;
+    text-align: end;
+}
+
+.message-sender {
+    text-decoration: underline;
+    color: white;
+
+}
