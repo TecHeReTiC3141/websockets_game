@@ -92,8 +92,23 @@ socket.on('updateParticles', backEndParticle => {
     }
 })
 
-socket.on('addMessage', message => {
-    $('.chat-content .messages').append($(`<p>${message}</p>`));
+function getMessage(message, playerId) {
+    const currentPlayer = frontEndPlayers[playerId];
+    if (!currentPlayer) {
+        return null;
+    }
+    return $(`<div class="message">
+        <img src="${currentPlayer.avatarUrl}" class="avatar" alt="Player avatar">
+        <div>
+             <h5 class="message-sender">${currentPlayer.name}. ${new Date().toLocaleString()}</h5>
+            <p class="message-text">${message}</p>
+        </div>
+       
+    </div>`)
+}
+
+socket.on('addMessage', ({ message, playerId }) => {
+    $('.chat-content .messages').append(getMessage(message, playerId));
     $('.chat-content').prop('scrollTop',
         $('.chat-content').prop('scrollHeight'));
 })
@@ -229,8 +244,6 @@ const keys = {
     },
 }
 
-
-
 setInterval(() => {
     const currentPlayer = frontEndPlayers[socket.id]
     if (keys.d.pressed && currentPlayer.x < mainCanvas.width - currentPlayer.radius * 2) {
@@ -282,7 +295,7 @@ setInterval(() => {
 }, 60);
 
 window.addEventListener('keydown', ev => {
-    if (!frontEndPlayers[socket.id] || !(ev.key in keys)) return;
+    if (messageInput.is(':focus') || !frontEndPlayers[socket.id] || !(ev.key in keys)) return;
     keys[ev.key].pressed = true;
 })
 

@@ -109,7 +109,7 @@ io.on('connection', socket => {
     })
 
     socket.on('newMessage', ({ message }) => {
-        io.emit('addMessage', message)
+        io.emit('addMessage', { message, playerId: socket.id })
     })
 
     socket.on('disconnect', async reason => {
