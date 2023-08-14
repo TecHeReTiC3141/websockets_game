@@ -52,7 +52,9 @@ socket.on('updatePlayers', (backEndPlayers) => {
     for (let id in frontEndPlayers) {
         if (!backendIds.has(id)) {
             if (id === socket.id) {
-                document.querySelector('.username-container').style.display = 'block';
+                $('.username-container').css({display: 'none'});
+                $("#message-input").prop('disabled', true)
+                    .prop('placeholder', "Start game first to unlock chat");
             }
             delete frontEndPlayers[id];
         }
