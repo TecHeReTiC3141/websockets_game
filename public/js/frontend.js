@@ -19,15 +19,11 @@ const playerInputs = [];
 let sequenceNumber = 0;
 
 socket.on('updatePlayers', (backEndPlayers) => {
-    let backendIds = new Set()
-    for (let backEndPlayer of backEndPlayers) {
-        const {id, x, y, radius, color, health, score,
-            name, avatarUrl, sequenceNumber } = backEndPlayer;
-        backendIds.add(id);
+    for (let id in backEndPlayers) {
+        const {x, y, radius, color, health, score, name, avatarUrl } = backEndPlayers[id];
         if (!frontEndPlayers[id]) {
             frontEndPlayers[id] = new Player(
-                {x, y, radius, color,
-                    name, avatarUrl});
+                {x, y, radius, color, name, avatarUrl});
         } else {
             frontEndPlayers[id].radius = Player.MAX_RADIUS * health / 100;
             frontEndPlayers[id].score = score;
@@ -36,7 +32,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
             }
             if (id === socket.id) {
                 const lastServerInputIndex = playerInputs.findIndex(input => {
-                    return sequenceNumber === input.sequenceNumber;
+                    return backEndPlayers[id].sequenceNumber === input.sequenceNumber;
                 })
                 if (lastServerInputIndex !== -1) {
                     playerInputs.splice(0, lastServerInputIndex + 1);
@@ -50,7 +46,7 @@ socket.on('updatePlayers', (backEndPlayers) => {
     }
 
     for (let id in frontEndPlayers) {
-        if (!backendIds.has(id)) {
+        if (!(id in backEndPlayers)) {
             if (id === socket.id) {
                 $('.username-container').css({display: 'block'});
                 $("#message-input").prop('disabled', true)
