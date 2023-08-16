@@ -82,11 +82,17 @@ socket.on('updateProjectiles', (backEndProjectiles) => {
     }
 })
 
-socket.on('updateParticles', backEndParticle => {
-    for (let id in backEndParticle) {
+socket.on('updateParticles', backEndParticles => {
+    for (let id in backEndParticles) {
         frontEndParticles[id] = new Particle({
-            ...backEndParticle[id],
+            ...backEndParticles[id],
         })
+    }
+
+    for (let id in frontEndParticles) {
+        if (!backEndParticles[id]) {
+            delete frontEndParticles[id];
+        }
     }
 })
 
